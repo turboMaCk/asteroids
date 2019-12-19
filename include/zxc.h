@@ -2,7 +2,7 @@
 #define _ZXC_
 
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
+#include <SDL_image.h>
 
 void zxc_log_sdl_err(const char* message) {
   fprintf(stderr, "SDL ERR %s: %s", message, SDL_GetError());
