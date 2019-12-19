@@ -1,9 +1,10 @@
 #include <stdio.h>
 #include <SDL2/SDL.h>
 #include <stdbool.h>
+#include <zxc.h>
 
-const uint win_width = 1280;
-const uint win_height = 720;
+const uint win_width = 1200;
+const uint win_height = 800;
 
 int main() {
   SDL_Window* win;
@@ -20,7 +21,7 @@ int main() {
                          SDL_WINDOW_SHOWN);
 
   if (!win) {
-    printf("Can't create window");
+    zxc_log_sdl_err("CreateWindow");
     SDL_Quit();
     return 1;
   }
@@ -28,11 +29,13 @@ int main() {
   ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
   if (!ren) {
-    printf("Can't create renderer");
+    zxc_log_sdl_err("CreateRenderer");
     SDL_DestroyWindow(win);
     SDL_Quit();
     return 1;
   }
+
+  SDL_Texture* bg = zxc_load_texture("images/background.jpg", ren);
 
   while (running) {
     SDL_Event event;
@@ -46,6 +49,7 @@ int main() {
     }
 
     SDL_RenderClear(ren);
+    zxc_render_texture_fill(bg, ren);
     SDL_RenderPresent(ren);
   }
 
