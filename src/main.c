@@ -9,6 +9,11 @@ const uint win_height = 800;
 
 const double toRad = 0.01745329252;
 
+typedef struct {
+  double thrust;
+  double rotation;
+} Input;
+
 int main()
 {
   SDL_Window* win;
@@ -16,10 +21,8 @@ int main()
   bool running = true;
   double rotation = 0;
   double rotation_mom = 0;
-  SDL_Point pos = {
-                   .x = (win_width - 48)/2,
-                   .y = (win_height -48)/2,
-  };
+  SDL_Point pos = { (win_width - 48)/2, (win_height -48)/2 };
+  Input input = { 0, 0 };
 
   SDL_Init(SDL_INIT_VIDEO);
 
@@ -57,34 +60,56 @@ int main()
       case SDL_QUIT: {
         running = false;
       } break;
-      case SDL_KEYDOWN: {
+      case SDL_KEYUP: {
         switch (event.key.keysym.sym) {
         case SDLK_LEFT: {
-          if (rotation_mom > -20)
-            rotation_mom -= 2;
+          input.rotation = 0;
         } break;
         case SDLK_RIGHT: {
-          if (rotation_mom < 20)
-            rotation_mom += 2;
+          input.rotation = 0;
         } break;
         case SDLK_UP: {
-          pos.x += 10 * sin(rotation * toRad);
-          pos.y += -10 * cos(rotation * toRad);
+          input.thrust = 0;
+        } break;
+        case SDLK_DOWN: {
+          input.thrust = 0;
         } break;
         } break;
       } break;
+      case SDL_KEYDOWN: {
+        switch (event.key.keysym.sym) {
+        case SDLK_LEFT: {
+          input.rotation = -1;
+        } break;
+        case SDLK_RIGHT: {
+          input.rotation = 1;
+        } break;
+        case SDLK_UP: {
+          input.thrust = 1;
+        } break;
+        case SDLK_DOWN: {
+          input.thrust = -1;
+        } break;
+        } break;
+      } break;
+      } break;
+    }
+
+    if (input.rotation != 0) {
+      rotation_mom += fabs(rotation_mom) < 5 ? input.rotation : 0;
+    } else {
+      // slowing rotation
+      if (fabs(rotation_mom) > 0.2) {
+        rotation_mom += rotation_mom > 0 ? -0.2 : 0.2;
+      } else {
+        rotation_mom = 0;
       }
     }
 
     rotation += rotation_mom;
 
-    if (rotation_mom > 0) {
-      rotation_mom -= 0.2;
-    } else if (rotation_mom < 0) {
-      rotation_mom += 0.2;
-    } else {
-      rotation_mom = 0;
-    }
+    pos.x += 10 * input.thrust * sin(rotation * toRad);
+    pos.y += -10 * input.thrust * cos(rotation * toRad);
 
     SDL_RenderClear(ren);
     zxc_render_texture_fill(bg, ren);
