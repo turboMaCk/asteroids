@@ -41,4 +41,21 @@ void zxc_render_texture_fill(SDL_Texture* texture, SDL_Renderer* ren)
   SDL_RenderCopy(ren, texture, NULL, NULL);
 }
 
+typedef struct {
+  float x;
+  float y;
+} Vec;
+
+Vec vec_add(Vec a, Vec b)
+{
+  Vec res = { a.x + b.x, a.y + b.y };
+  return res;
+}
+
+Vec vec_scale(float f, Vec vec)
+{
+  Vec res = { vec.x * f, vec.y * f };
+  return res;
+}
+
 #endif

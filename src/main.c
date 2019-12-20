@@ -4,14 +4,16 @@
 #include <math.h>
 #include <zxc.h>
 
+#define SSIZE 48
+
 const uint win_width = 1200;
 const uint win_height = 800;
 
 const double toRad = 0.01745329252;
 
 typedef struct {
-  double thrust;
   double rotation;
+  float thrust;
 } Input;
 
 int main()
@@ -21,8 +23,9 @@ int main()
   bool running = true;
   double rotation = 0;
   double rotation_mom = 0;
-  SDL_Point pos = { (win_width - 48)/2, (win_height -48)/2 };
+  SDL_Point pos = { (win_width - SSIZE)/2, (win_height - SSIZE)/2 };
   Input input = { 0, 0 };
+  Vec vel = { 0,0 };
 
   SDL_Init(SDL_INIT_VIDEO);
 
@@ -95,6 +98,7 @@ int main()
       } break;
     }
 
+    // ROTATION
     if (input.rotation != 0) {
       rotation_mom += fabs(rotation_mom) < 5 ? input.rotation : 0;
     } else {
@@ -105,11 +109,25 @@ int main()
         rotation_mom = 0;
       }
     }
-
     rotation += rotation_mom;
 
-    pos.x += 10 * input.thrust * sin(rotation * toRad);
-    pos.y += -10 * input.thrust * cos(rotation * toRad);
+    // VELOCITY
+    if (input.thrust != 0) {
+      Vec thrust_vec = {
+                        .x = input.thrust * sin(rotation * toRad),
+                        .y = -1 * input.thrust * cos(rotation * toRad),
+      };
+
+      vel = vec_add(vel, thrust_vec);
+    } else {
+      vel = vec_scale(0.95, vel);
+    }
+
+    // POSITION
+    pos.x += (int) vel.x;
+    pos.y += (int) vel.y;
+
+    /* RENDER */
 
     SDL_RenderClear(ren);
     zxc_render_texture_fill(bg, ren);
