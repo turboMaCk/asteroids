@@ -6,7 +6,7 @@ ODIR=obj
 SRCDIR=src
 OUTDIR=build
 
-LIBS=-lSDL2 -lSDL2_image
+LIBS=-lSDL2 -lSDL2_image -lm
 
 _DEPS=
 DEPS=$(patsubst %,$(INCDIR)/%,$(_DEPS))

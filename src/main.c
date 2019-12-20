@@ -1,10 +1,13 @@
 #include <stdio.h>
 #include <SDL2/SDL.h>
 #include <stdbool.h>
+#include <math.h>
 #include <zxc.h>
 
 const uint win_width = 1200;
 const uint win_height = 800;
+
+const double toRad = 0.01745329252;
 
 int main()
 {
@@ -12,6 +15,7 @@ int main()
   SDL_Renderer* ren;
   bool running = true;
   double rotation = 0;
+  double rotation_mom = 0;
   SDL_Point pos = {
                    .x = (win_width - 48)/2,
                    .y = (win_height -48)/2,
@@ -56,17 +60,30 @@ int main()
       case SDL_KEYDOWN: {
         switch (event.key.keysym.sym) {
         case SDLK_LEFT: {
-          rotation += 10;
+          if (rotation_mom > -20)
+            rotation_mom -= 2;
         } break;
         case SDLK_RIGHT: {
-          rotation -= 10;
+          if (rotation_mom < 20)
+            rotation_mom += 2;
         } break;
         case SDLK_UP: {
-          pos.y -= 10;
+          pos.x += 10 * sin(rotation * toRad);
+          pos.y += -10 * cos(rotation * toRad);
         } break;
         } break;
       } break;
       }
+    }
+
+    rotation += rotation_mom;
+
+    if (rotation_mom > 0) {
+      rotation_mom -= 0.2;
+    } else if (rotation_mom < 0) {
+      rotation_mom += 0.2;
+    } else {
+      rotation_mom = 0;
     }
 
     SDL_RenderClear(ren);
