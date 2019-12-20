@@ -58,4 +58,31 @@ Vec vec_scale(float f, Vec vec)
   return res;
 }
 
+float gdc(int a, int b)
+{
+  float n1 = abs(a);
+  float n2 = abs(b);
+
+  while(n1!=n2) {
+    if(n1 > n2)
+      n1 -= n2;
+    else
+      n2 -= n1;
+  }
+
+  return n1;
+}
+
+Vec vec_limit(float f, Vec vec)
+{
+  float sum = fabs(vec.x) + fabs(vec.y);
+  if (sum > f) {
+    float k = f / sum;
+    Vec res = { vec.x * k, vec.y * k };
+    return res;
+  } else {
+    return vec;
+  }
+}
+
 #endif

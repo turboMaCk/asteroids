@@ -6,8 +6,8 @@
 
 #define SSIZE 48
 
-const uint win_width = 1200;
-const uint win_height = 800;
+const int win_width = 1200;
+const int win_height = 800;
 
 const double toRad = 0.01745329252;
 
@@ -118,14 +118,27 @@ int main()
                         .y = -1 * input.thrust * cos(rotation * toRad),
       };
 
-      vel = vec_add(vel, thrust_vec);
+      vel = vec_limit(20, vec_add(vel, thrust_vec));
     } else {
       vel = vec_scale(0.95, vel);
     }
 
+
     // POSITION
     pos.x += (int) vel.x;
     pos.y += (int) vel.y;
+
+    if (pos.x > win_width) {
+      pos.x = -SSIZE;
+    } else if (pos.x < -SSIZE) {
+      pos.x = win_width;
+    }
+
+    if (pos.y > win_height) {
+      pos.y = -SSIZE;
+    } else if (pos.y < -SSIZE) {
+      pos.y = win_height;
+    }
 
     /* RENDER */
 
