@@ -27,7 +27,20 @@ int main()
   Input input = { 0, 0 };
   Vec vel = { 0,0 };
 
-  SDL_Init(SDL_INIT_VIDEO);
+  SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER);
+
+  /* SDL_GameController* controller; */
+  /* for (int i = 0; i < SDL_NumJoysticks(); ++i) { */
+  /*   if (SDL_IsGameController(i)) { */
+  /*     fprintf(stdout, "Index %i is a compatible controller named %s\n", i, SDL_GameControllerNameForIndex(i)); */
+  /*     controller = SDL_GameControllerOpen(i); */
+  /*     /\* joystick = SDL_GameControllerGetJoystick(controller); *\/ */
+
+  /*     break; */
+  /*   } else { */
+  /*     fprintf(stdout, "Index %i is NOT a compatible controller\n", i); */
+  /*   } */
+  /* } */
 
   win = SDL_CreateWindow("Asteroids",
                          SDL_WINDOWPOS_CENTERED,
@@ -58,10 +71,21 @@ int main()
   while (running) {
     SDL_Event event;
 
+    // KEYBOARD
     while (SDL_PollEvent(&event)) {
       switch (event.type) {
       case SDL_QUIT: {
         running = false;
+      } break;
+      case SDL_CONTROLLERAXISMOTION: {
+        const char* axis = "";
+        if (event.caxis.axis == SDL_CONTROLLER_AXIS_LEFTX) {
+          axis = "left_x";
+        } else if (event.caxis.axis == SDL_CONTROLLER_AXIS_LEFTY) {
+          axis = "left_y";
+        }
+
+        printf("Axis %s is val is now %d", axis, event.caxis.value);
       } break;
       case SDL_KEYUP: {
         switch (event.key.keysym.sym) {
