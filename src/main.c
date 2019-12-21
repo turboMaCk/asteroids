@@ -23,24 +23,11 @@ int main()
   bool running = true;
   double rotation = 0;
   double rotation_mom = 0;
-  SDL_Point pos = { (win_width - SSIZE)/2, (win_height - SSIZE)/2 };
+  Vec pos = { (win_width - SSIZE)/2, (win_height - SSIZE)/2 };
   Input input = { 0, 0 };
   Vec vel = { 0,0 };
 
-  SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER);
-
-  /* SDL_GameController* controller; */
-  /* for (int i = 0; i < SDL_NumJoysticks(); ++i) { */
-  /*   if (SDL_IsGameController(i)) { */
-  /*     fprintf(stdout, "Index %i is a compatible controller named %s\n", i, SDL_GameControllerNameForIndex(i)); */
-  /*     controller = SDL_GameControllerOpen(i); */
-  /*     /\* joystick = SDL_GameControllerGetJoystick(controller); *\/ */
-
-  /*     break; */
-  /*   } else { */
-  /*     fprintf(stdout, "Index %i is NOT a compatible controller\n", i); */
-  /*   } */
-  /* } */
+  SDL_Init(SDL_INIT_VIDEO);
 
   win = SDL_CreateWindow("Asteroids",
                          SDL_WINDOWPOS_CENTERED,
@@ -55,7 +42,7 @@ int main()
     return 1;
   }
 
-  ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+  ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED);
 
   if (!ren) {
     zxc_log_sdl_err("CreateRenderer");
@@ -68,24 +55,30 @@ int main()
 
   SDL_Texture* ship = zxc_load_texture("images/spaceship.png", ren);
 
+  // FPS meter
+  Uint32 frame_count = 0;
+  Uint32 last_time = SDL_GetTicks();
+  float speed = 100;
+  Uint32 time;
+
   while (running) {
+    ++frame_count;
+    time = SDL_GetTicks();
+
+    if (last_time + 1000 <= time) {
+      last_time = time;
+      speed = ((float) frame_count)/60;
+      SDL_Log("FPS: %d speed: %f\n", frame_count, speed);
+      frame_count = 0;
+    }
+
     SDL_Event event;
 
-    // KEYBOARD
+    // HANDLE EVENTS
     while (SDL_PollEvent(&event)) {
       switch (event.type) {
       case SDL_QUIT: {
         running = false;
-      } break;
-      case SDL_CONTROLLERAXISMOTION: {
-        const char* axis = "";
-        if (event.caxis.axis == SDL_CONTROLLER_AXIS_LEFTX) {
-          axis = "left_x";
-        } else if (event.caxis.axis == SDL_CONTROLLER_AXIS_LEFTY) {
-          axis = "left_y";
-        }
-
-        printf("Axis %s is val is now %d", axis, event.caxis.value);
       } break;
       case SDL_KEYUP: {
         switch (event.key.keysym.sym) {
@@ -124,33 +117,32 @@ int main()
 
     // ROTATION
     if (input.rotation != 0) {
-      rotation_mom += fabs(rotation_mom) < 5 ? input.rotation : 0;
+      rotation_mom += fabs(rotation_mom) < 5 ? input.rotation/speed : 0;
     } else {
       // slowing rotation
-      if (fabs(rotation_mom) > 0.2) {
-        rotation_mom += rotation_mom > 0 ? -0.2 : 0.2;
+      if (fabs(rotation_mom) > 0.1) {
+        rotation_mom += rotation_mom > 0 ? -0.05/speed : 0.05/speed;
       } else {
         rotation_mom = 0;
       }
     }
-    rotation += rotation_mom;
+    rotation += rotation_mom/speed;
 
     // VELOCITY
-    if (input.thrust != 0) {
+    if (fabs(input.thrust) > 0.1) {
       Vec thrust_vec = {
-                        .x = input.thrust * sin(rotation * toRad),
-                        .y = -1 * input.thrust * cos(rotation * toRad),
+                        .x = (input.thrust * sin(rotation * toRad)) / speed,
+                        .y = (-1 * input.thrust * cos(rotation * toRad)) / speed,
       };
 
       vel = vec_limit(20, vec_add(vel, thrust_vec));
     } else {
-      vel = vec_scale(0.95, vel);
+      vel = vec_scale(1 - (0.01 / speed), vel);
     }
 
-
     // POSITION
-    pos.x += (int) vel.x;
-    pos.y += (int) vel.y;
+    pos.x += (int) vel.x/speed;
+    pos.y += (int) vel.y/speed;
 
     if (pos.x > win_width) {
       pos.x = -SSIZE;
@@ -163,8 +155,6 @@ int main()
     } else if (pos.y < -SSIZE) {
       pos.y = win_height;
     }
-
-    /* RENDER */
 
     SDL_RenderClear(ren);
     zxc_render_texture_fill(bg, ren);
@@ -184,7 +174,6 @@ int main()
     };
 
     SDL_RenderCopyEx(ren, ship, &src, &dest, rotation, NULL, SDL_FLIP_NONE);
-
     SDL_RenderPresent(ren);
   }
 
