@@ -42,8 +42,8 @@ void zxc_render_texture_fill(SDL_Texture* texture, SDL_Renderer* ren)
 }
 
 typedef struct {
-  float x;
-  float y;
+  double x;
+  double y;
 } Vec;
 
 Vec vec_add(Vec a, Vec b)

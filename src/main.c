@@ -120,16 +120,12 @@ int main()
       rotation_mom += fabs(rotation_mom) < 5 ? input.rotation/speed : 0;
     } else {
       // slowing rotation
-      if (fabs(rotation_mom) > 0.1) {
-        rotation_mom += rotation_mom > 0 ? -0.05/speed : 0.05/speed;
-      } else {
-        rotation_mom = 0;
-      }
+     rotation_mom += rotation_mom > 0 ? -0.05/speed : 0.05/speed;
     }
     rotation += rotation_mom/speed;
 
     // VELOCITY
-    if (fabs(input.thrust) > 0.1) {
+    if (fabs(input.thrust) > 0) {
       Vec thrust_vec = {
                         .x = (input.thrust * sin(rotation * toRad)) / speed,
                         .y = (-1 * input.thrust * cos(rotation * toRad)) / speed,
@@ -141,8 +137,8 @@ int main()
     }
 
     // POSITION
-    pos.x += (int) vel.x/speed;
-    pos.y += (int) vel.y/speed;
+    pos.x += vel.x/speed;
+    pos.y += vel.y/speed;
 
     if (pos.x > win_width) {
       pos.x = -SSIZE;
@@ -167,8 +163,8 @@ int main()
     };
 
     SDL_Rect dest = {
-                     .x = pos.x,
-                     .y = pos.y,
+                     .x = (int) pos.x,
+                     .y = (int) pos.y,
                      .w = 38,
                      .h = 38,
     };
