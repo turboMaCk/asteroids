@@ -16,6 +16,35 @@ typedef struct {
   float thrust;
 } Input;
 
+typedef struct {
+  SDL_Texture* texture;
+  uint tick;
+  Vec position;
+} Explosion;
+
+int update_explosion(Explosion* explosion, SDL_Renderer* ren) {
+  if (explosion->texture == NULL) return 0;
+
+  int x = (explosion->tick / 100) * 50;
+  SDL_Rect src = {x,0, 50, 50};
+
+  SDL_Rect dest = {explosion->position.x, explosion->position.y, 50, 50};
+
+  SDL_RenderCopy(ren, explosion->texture, &src, &dest);
+
+  if (explosion->tick < 2000) {
+    explosion->tick += 1;
+  } else {
+    explosion->tick = 0;
+  }
+
+  return 2000 - explosion->tick;
+}
+
+void destroy_explosion(Explosion* explosion) {
+  explosion->texture = NULL;
+}
+
 int main()
 {
   SDL_Window* win;
@@ -42,6 +71,7 @@ int main()
     return 1;
   }
 
+  // Renderer
   ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED);
 
   if (!ren) {
@@ -52,8 +82,15 @@ int main()
   }
 
   SDL_Texture* bg = zxc_load_texture("images/background.jpg", ren);
-
   SDL_Texture* ship = zxc_load_texture("images/spaceship.png", ren);
+
+  SDL_Texture* explosion_a = zxc_load_texture("images/explosions/type_A.png", ren);
+  SDL_Texture* explosion_b = zxc_load_texture("images/explosions/type_B.png", ren);
+
+
+  Explosion explosions[32] = {{explosion_a, 0, {100,100}},
+                              {explosion_b, 0, {200,50}},
+  };
 
   // FPS meter
   Uint32 frame_count = 0;
@@ -168,6 +205,12 @@ int main()
                      .w = 38,
                      .h = 38,
     };
+
+    for (uint i = 0; i < sizeof(explosions)/sizeof(explosions[0]); ++i) {
+      if (update_explosion(&explosions[i], ren) == 0) {
+        destroy_explosion(&explosions[i]);
+      }
+    }
 
     SDL_RenderCopyEx(ren, ship, &src, &dest, rotation, NULL, SDL_FLIP_NONE);
     SDL_RenderPresent(ren);
