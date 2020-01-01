@@ -12,10 +12,131 @@ const int win_height = 800;
 
 const double toRad = 0.01745329252;
 
+// INPUT
+
 typedef struct {
   double rotation;
   float thrust;
 } Input;
+
+void handle_keyboard(SDL_Event* event, Input* input)
+{
+  switch (event->type) {
+  case SDL_KEYUP: {
+    switch (event->key.keysym.sym) {
+    case SDLK_LEFT: {
+      input->rotation = 0;
+    } break;
+    case SDLK_RIGHT: {
+      input->rotation = 0;
+    } break;
+    case SDLK_UP: {
+      input->thrust = 0;
+    } break;
+    case SDLK_DOWN: {
+      input->thrust = 0;
+    } break;
+    } break;
+    case SDL_KEYDOWN: {
+      switch (event->key.keysym.sym) {
+      case SDLK_LEFT: {
+        input->rotation = -1;
+      } break;
+      case SDLK_RIGHT: {
+        input->rotation = 1;
+      } break;
+      case SDLK_UP: {
+        input->thrust = 1;
+      } break;
+      case SDLK_DOWN: {
+        input->thrust = -1;
+      } break;
+      } break;
+    } break;
+    }; break;
+  };
+}
+
+// SHIP
+
+typedef struct {
+  SDL_Texture* texture;
+  double rotation;
+  double rotation_mom;
+  Vec pos;
+  Vec vel;
+} Ship;
+
+Ship init_ship(Vec pos, SDL_Renderer* ren)
+{
+  SDL_Texture* texture = zxc_load_texture("images/spaceship.png", ren);
+  double rotation = 0;
+  double rotation_mom = 0;
+  Vec vel = { 0,0 };
+
+  Ship ship = {texture, rotation ,rotation_mom, pos, vel};
+  return ship;
+}
+
+void update_ship(Input* input, Ship* ship, float speed)
+{
+  // ROTATION
+  if (input->rotation != 0) {
+    ship->rotation_mom += fabs(ship->rotation_mom) < 5 ? input->rotation/speed : 0;
+  } else {
+    // slowing rotation
+    ship->rotation_mom += ship->rotation_mom > 0 ? -0.05/speed : 0.05/speed;
+  }
+  ship->rotation += ship->rotation_mom/speed;
+
+  // VELOCITY
+  if (fabs(input->thrust) > 0) {
+    Vec thrust_vec = {
+                      .x = (input->thrust * sin(ship->rotation * toRad)) / speed,
+                      .y = (-1 * input->thrust * cos(ship->rotation * toRad)) / speed,
+    };
+
+    ship->vel = vec_limit(20, vec_add(ship->vel, thrust_vec));
+  } else {
+    ship->vel = vec_scale(1 - (0.01 / speed), ship->vel);
+  }
+
+  // POSITION
+  ship->pos.x += ship->vel.x/speed;
+  ship->pos.y += ship->vel.y/speed;
+
+  if (ship->pos.x > win_width) {
+    ship->pos.x = -SSIZE;
+  } else if (ship->pos.x < -SSIZE) {
+    ship->pos.x = win_width;
+  }
+
+  if (ship->pos.y > win_height) {
+    ship->pos.y = -SSIZE;
+  } else if (ship->pos.y < -SSIZE) {
+    ship->pos.y = win_height;
+  }
+}
+
+void render_ship(Ship* ship, SDL_Renderer* ren)
+{
+    SDL_Rect src = {
+                    .x = 38,
+                    .y = 38,
+                    .w = 38,
+                    .h = 38,
+    };
+
+    SDL_Rect dest = {
+                     .x = (int) ship->pos.x,
+                     .y = (int) ship->pos.y,
+                     .w = 38,
+                     .h = 38,
+    };
+    SDL_RenderCopyEx(ren, ship->texture, &src, &dest, ship->rotation, NULL, SDL_FLIP_NONE);
+}
+
+// EXPLOSIONS
 
 typedef struct {
   SDL_Texture* texture;
@@ -29,7 +150,6 @@ typedef struct {
   Explosion arr[32];
   uint size;
 } Explosions;
-
 
 void create_explosion(Explosions* explosions, SDL_Texture* texture, uint size, uint duration, Vec pos)
 {
@@ -61,7 +181,7 @@ void create_explosion(Explosions* explosions, SDL_Texture* texture, uint size, u
   }
 }
 
-int update_explosion(Explosion* explosion, SDL_Renderer* ren, bool keyframe)
+int render_explosion(Explosion* explosion, bool keyframe, SDL_Renderer* ren)
 {
   if (explosion->texture == NULL) return 0;
 
@@ -98,11 +218,7 @@ int main()
   SDL_Window* win;
   SDL_Renderer* ren;
   bool running = true;
-  double rotation = 0;
-  double rotation_mom = 0;
-  Vec pos = { (win_width - SSIZE)/2, (win_height - SSIZE)/2 };
   Input input = { 0, 0 };
-  Vec vel = { 0,0 };
 
   SDL_Init(SDL_INIT_VIDEO);
 
@@ -129,14 +245,18 @@ int main()
     return 1;
   }
 
+  // Background
   SDL_Texture* bg = zxc_load_texture("images/background.jpg", ren);
-  SDL_Texture* ship = zxc_load_texture("images/spaceship.png", ren);
+
+  // Entities
+  Vec ship_pos = { (win_width - SSIZE)/2, (win_height - SSIZE)/2 };
+  Ship ship = init_ship(ship_pos, ren);
+  Explosions explosions;
 
   SDL_Texture* explosion_a = zxc_load_texture("images/explosions/type_A.png", ren);
   SDL_Texture* explosion_b = zxc_load_texture("images/explosions/type_B.png", ren);
   SDL_Texture* explosion_c = zxc_load_texture("images/explosions/type_C.png", ren);
 
-  Explosions explosions;
 
   Vec epos = {100,100};
   create_explosion(&explosions, explosion_a, 50, 30, epos);
@@ -146,7 +266,7 @@ int main()
   // FPS meter
   uint frame_count = 0;
   uint last_time = SDL_GetTicks();
-  float speed = 10;
+  float speed = 3;
   uint time;
   bool keyframe = true;
 
@@ -176,101 +296,27 @@ int main()
       case SDL_QUIT: {
         running = false;
       } break;
-      case SDL_KEYUP: {
-        switch (event.key.keysym.sym) {
-        case SDLK_LEFT: {
-          input.rotation = 0;
-        } break;
-        case SDLK_RIGHT: {
-          input.rotation = 0;
-        } break;
-        case SDLK_UP: {
-          input.thrust = 0;
-        } break;
-        case SDLK_DOWN: {
-          input.thrust = 0;
-        } break;
-        } break;
-      } break;
+      case SDL_KEYUP:
       case SDL_KEYDOWN: {
-        switch (event.key.keysym.sym) {
-        case SDLK_LEFT: {
-          input.rotation = -1;
-        } break;
-        case SDLK_RIGHT: {
-          input.rotation = 1;
-        } break;
-        case SDLK_UP: {
-          input.thrust = 1;
-        } break;
-        case SDLK_DOWN: {
-          input.thrust = -1;
-        } break;
-        } break;
+        handle_keyboard(&event, &input);
       } break;
       } break;
     }
 
-    // ROTATION
-    if (input.rotation != 0) {
-      rotation_mom += fabs(rotation_mom) < 5 ? input.rotation/speed : 0;
-    } else {
-      // slowing rotation
-     rotation_mom += rotation_mom > 0 ? -0.05/speed : 0.05/speed;
-    }
-    rotation += rotation_mom/speed;
+    // UPDATE
+    update_ship(&input, &ship, speed);
 
-    // VELOCITY
-    if (fabs(input.thrust) > 0) {
-      Vec thrust_vec = {
-                        .x = (input.thrust * sin(rotation * toRad)) / speed,
-                        .y = (-1 * input.thrust * cos(rotation * toRad)) / speed,
-      };
-
-      vel = vec_limit(20, vec_add(vel, thrust_vec));
-    } else {
-      vel = vec_scale(1 - (0.01 / speed), vel);
-    }
-
-    // POSITION
-    pos.x += vel.x/speed;
-    pos.y += vel.y/speed;
-
-    if (pos.x > win_width) {
-      pos.x = -SSIZE;
-    } else if (pos.x < -SSIZE) {
-      pos.x = win_width;
-    }
-
-    if (pos.y > win_height) {
-      pos.y = -SSIZE;
-    } else if (pos.y < -SSIZE) {
-      pos.y = win_height;
-    }
-
+    // RENDER
     SDL_RenderClear(ren);
     zxc_render_texture_fill(bg, ren);
 
-    SDL_Rect src = {
-                    .x = 38,
-                    .y = 38,
-                    .w = 38,
-                    .h = 38,
-    };
-
-    SDL_Rect dest = {
-                     .x = (int) pos.x,
-                     .y = (int) pos.y,
-                     .w = 38,
-                     .h = 38,
-    };
-
     for (uint i = 0; i < explosions.size; ++i) {
-      if (update_explosion(&explosions.arr[i], ren, keyframe) == 0)
+      if (render_explosion(&explosions.arr[i], keyframe, ren) == 0)
         destroy_explosion(&explosions.arr[i]);
     }
 
-    SDL_RenderCopyEx(ren, ship, &src, &dest, rotation, NULL, SDL_FLIP_NONE);
+    render_ship(&ship, ren);
+
     SDL_RenderPresent(ren);
   }
 
