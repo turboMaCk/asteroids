@@ -4,6 +4,7 @@
 #include <math.h>
 #include <zxc.h>
 
+// size of ship sprite
 #define SSIZE 48
 
 const int win_width = 1200;
@@ -19,29 +20,76 @@ typedef struct {
 typedef struct {
   SDL_Texture* texture;
   uint tick;
+  uint size;
+  uint duration;
   Vec position;
 } Explosion;
 
-int update_explosion(Explosion* explosion, SDL_Renderer* ren) {
+typedef struct {
+  Explosion arr[32];
+  uint size;
+} Explosions;
+
+
+void create_explosion(Explosions* explosions, SDL_Texture* texture, uint size, uint duration, Vec pos)
+{
+  uint loc = explosions->size;
+
+  if (loc >= sizeof(explosions->arr)/sizeof(explosions->arr[0])) {
+
+    // put new item to first place so it's guaranteed to fit
+    Explosion expl = {texture, 0, size, duration, pos};
+    explosions->arr[0] = expl;
+    uint new_explosions_size = 1;
+
+    // copy the rest in reverse order
+    uint current_index = 1;
+    for (uint i = sizeof(explosions->arr)/sizeof(explosions->arr[0]) - 1; i > 0; --i) {
+
+      // THIS MIGHT OVERWRITE SOME EXPLOSIONS DATA
+      if (explosions->arr[i].texture != NULL) {
+        explosions->arr[current_index] = explosions->arr[i];
+        new_explosions_size++;
+        current_index++;
+      }
+    }
+    explosions->size = new_explosions_size;
+  } else {
+    Explosion explosion = {texture, 0, size, duration, pos};
+    explosions->arr[loc] = explosion;
+    explosions->size++;
+  }
+}
+
+int update_explosion(Explosion* explosion, SDL_Renderer* ren, bool keyframe)
+{
   if (explosion->texture == NULL) return 0;
 
-  int x = (explosion->tick / 100) * 50;
-  SDL_Rect src = {x,0, 50, 50};
+  int x = explosion->tick * explosion->size;
+  SDL_Rect src = {x, 0, explosion->size, explosion->size};
 
-  SDL_Rect dest = {explosion->position.x, explosion->position.y, 50, 50};
+  SDL_Rect dest = {
+                   .x = explosion->position.x,
+                   .y = explosion->position.y,
+                   .w = explosion->size,
+                   .h = explosion->size
+  };
 
   SDL_RenderCopy(ren, explosion->texture, &src, &dest);
 
-  if (explosion->tick < 2000) {
-    explosion->tick += 1;
-  } else {
-    explosion->tick = 0;
+  if (keyframe) {
+    if (explosion->tick < explosion->duration ) {
+        explosion->tick += 1;
+    } else {
+        explosion->tick = 0;
+    }
   }
 
-  return 2000 - explosion->tick;
+  return explosion->duration - explosion->tick;
 }
 
-void destroy_explosion(Explosion* explosion) {
+void destroy_explosion(Explosion* explosion)
+{
   explosion->texture = NULL;
 }
 
@@ -86,17 +134,21 @@ int main()
 
   SDL_Texture* explosion_a = zxc_load_texture("images/explosions/type_A.png", ren);
   SDL_Texture* explosion_b = zxc_load_texture("images/explosions/type_B.png", ren);
+  SDL_Texture* explosion_c = zxc_load_texture("images/explosions/type_C.png", ren);
 
+  Explosions explosions;
 
-  Explosion explosions[32] = {{explosion_a, 0, {100,100}},
-                              {explosion_b, 0, {200,50}},
-  };
+  Vec epos = {100,100};
+  create_explosion(&explosions, explosion_a, 50, 30, epos);
+  create_explosion(&explosions, explosion_b, 192, 64, epos);
+  create_explosion(&explosions, explosion_c, 256, 48, epos);
 
   // FPS meter
-  Uint32 frame_count = 0;
-  Uint32 last_time = SDL_GetTicks();
-  float speed = 100;
-  Uint32 time;
+  uint frame_count = 0;
+  uint last_time = SDL_GetTicks();
+  float speed = 10;
+  uint time;
+  bool keyframe = true;
 
   while (running) {
     ++frame_count;
@@ -107,6 +159,13 @@ int main()
       speed = ((float) frame_count)/60;
       SDL_Log("FPS: %d speed: %f\n", frame_count, speed);
       frame_count = 0;
+    }
+
+    // determine keyframes
+    if (frame_count % (int) speed == 0) {
+      keyframe = true;
+    } else {
+      keyframe = false;
     }
 
     SDL_Event event;
@@ -206,10 +265,9 @@ int main()
                      .h = 38,
     };
 
-    for (uint i = 0; i < sizeof(explosions)/sizeof(explosions[0]); ++i) {
-      if (update_explosion(&explosions[i], ren) == 0) {
-        destroy_explosion(&explosions[i]);
-      }
+    for (uint i = 0; i < explosions.size; ++i) {
+      if (update_explosion(&explosions.arr[i], ren, keyframe) == 0)
+        destroy_explosion(&explosions.arr[i]);
     }
 
     SDL_RenderCopyEx(ren, ship, &src, &dest, rotation, NULL, SDL_FLIP_NONE);
