@@ -3,9 +3,11 @@
 #include <stdbool.h>
 #include <math.h>
 #include <zxc.h>
+#include <time.h>
 
-// size of ship sprite
-#define SSIZE 48
+#define SSIZE 48 // size of ship sprite
+#define MAX_EXPLOSIONS 32
+#define MAX_ASTEROIDS 64
 
 const int win_width = 1200;
 const int win_height = 800;
@@ -147,7 +149,7 @@ typedef struct {
 } Explosion;
 
 typedef struct {
-  Explosion arr[32];
+  Explosion arr[MAX_EXPLOSIONS];
   uint size;
 } Explosions;
 
@@ -164,7 +166,7 @@ void create_explosion(Explosions* explosions, SDL_Texture* texture, uint size, u
 
     // copy the rest in reverse order
     uint current_index = 1;
-    for (uint i = sizeof(explosions->arr)/sizeof(explosions->arr[0]) - 1; i > 0; --i) {
+    for (uint i = MAX_EXPLOSIONS - 1; i > 0; --i) {
 
       // THIS MIGHT OVERWRITE SOME EXPLOSIONS DATA
       if (explosions->arr[i].texture != NULL) {
@@ -220,21 +222,47 @@ typedef struct {
   uint radius;
   uint tick;
   uint frames;
+  bool destroyed;
   Vec pos;
   Vec vel;
 } Asteroid;
 
-Asteroid init_asteroid(SDL_Texture* texture) {
+typedef struct {
+  uint size;
+  Asteroid asteroids[MAX_ASTEROIDS];
+} Asteroids;
+
+Asteroids* init_asteroids() {
+  Asteroids* asteroids = malloc(sizeof(Asteroids));
+  asteroids->size = 0;
+
+  return asteroids;
+}
+
+void destory_asteroyds(Asteroids* asteroids) {
+  free(asteroids);
+}
+
+void create_asteroid(SDL_Texture* texture, Asteroids* asteroids) {
   Vec pos = {200,300};
-  Vec vel = {(rand()%10)+1,(rand()%10)+1};
+  int vx = (rand()%10) + 1;
+  int vy = (rand()%10) + 1;
+  Vec vel = {vx,vy};
 
   // TODO: hardcoded radius
-  Asteroid asteroid = {texture, 32, 0, 16, pos, vel};
-  return asteroid;
+  Asteroid asteroid = {texture, 32, 0, 16, false, pos, vel};
+
+  if (asteroids->size < MAX_ASTEROIDS) {
+    asteroids->asteroids[asteroids->size++] = asteroid;
+  } else {
+    // TODO: clearing code
+  }
 }
 
 void update_asteroid(Asteroid* asteroid, float speed)
 {
+  if (asteroid->destroyed) return;
+
   asteroid->pos = vec_add(asteroid->pos, vec_scale(1/speed, asteroid->vel));
 
   int min_limit = (int)asteroid->radius*-2;
@@ -279,6 +307,9 @@ void render_asteroid(Asteroid* asteroid, bool keyframe, SDL_Renderer* ren) {
 
 int main()
 {
+  // seed random
+  srand ( time(NULL) );
+
   SDL_Window* win;
   SDL_Renderer* ren;
   bool running = true;
@@ -316,6 +347,7 @@ int main()
   Vec ship_pos = { (win_width - SSIZE)/2, (win_height - SSIZE)/2 };
   Ship ship = init_ship(ship_pos, ren);
   Explosions explosions;
+  Asteroids* asteroids = init_asteroids();
 
   // TODO: refactor
   SDL_Texture* explosion_a = zxc_load_texture("images/explosions/type_A.png", ren);
@@ -328,8 +360,12 @@ int main()
   create_explosion(&explosions, explosion_c, 256, 48, epos);
 
   SDL_Texture* asteroid_texture = zxc_load_texture("images/rock.png", ren);
-  Asteroid ast = init_asteroid(asteroid_texture);
-  Asteroid ast2 = init_asteroid(asteroid_texture);
+
+  create_asteroid(asteroid_texture, asteroids);
+  create_asteroid(asteroid_texture, asteroids);
+  create_asteroid(asteroid_texture, asteroids);
+  create_asteroid(asteroid_texture, asteroids);
+  create_asteroid(asteroid_texture, asteroids);
 
   // FPS meter
   uint frame_count = 0;
@@ -373,8 +409,10 @@ int main()
 
     // UPDATE
     update_ship(&input, &ship, speed);
-    update_asteroid(&ast, speed);
-    update_asteroid(&ast2, speed);
+
+    for (uint i = 0; i < asteroids->size; ++i) {
+      update_asteroid(&asteroids->asteroids[i], speed);
+    }
 
     // RENDER
     SDL_RenderClear(ren);
@@ -387,8 +425,9 @@ int main()
 
     render_ship(&ship, ren);
 
-    render_asteroid(&ast, keyframe, ren);
-    render_asteroid(&ast2, keyframe, ren);
+    for (uint i = 0; i < asteroids->size; ++i) {
+        render_asteroid(&asteroids->asteroids[i], keyframe, ren);
+    }
 
     SDL_RenderPresent(ren);
   }
