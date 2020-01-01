@@ -213,6 +213,70 @@ void destroy_explosion(Explosion* explosion)
   explosion->texture = NULL;
 }
 
+// ASTEROIDS
+
+typedef struct {
+  SDL_Texture* texture;
+  uint radius;
+  uint tick;
+  uint frames;
+  Vec pos;
+  Vec vel;
+} Asteroid;
+
+Asteroid init_asteroid(SDL_Texture* texture) {
+  Vec pos = {200,300};
+  Vec vel = {(rand()%10)+1,(rand()%10)+1};
+
+  // TODO: hardcoded radius
+  Asteroid asteroid = {texture, 32, 0, 16, pos, vel};
+  return asteroid;
+}
+
+void update_asteroid(Asteroid* asteroid, float speed)
+{
+  asteroid->pos = vec_add(asteroid->pos, vec_scale(1/speed, asteroid->vel));
+
+  int min_limit = (int)asteroid->radius*-2;
+
+  if (asteroid->pos.y > win_height) {
+    asteroid->pos.y = min_limit;
+  } else if (asteroid->pos.y < min_limit) {
+    asteroid->pos.y = win_height;
+  }
+
+  if (asteroid->pos.x > win_width) {
+    asteroid->pos.x = min_limit;
+  } else if (asteroid->pos.x < min_limit) {
+    asteroid->pos.x = win_width;
+  }
+}
+
+void render_asteroid(Asteroid* asteroid, bool keyframe, SDL_Renderer* ren) {
+  uint size = asteroid->radius*2;
+  uint k = 5;
+  uint x = (asteroid->tick/k)*size;
+  SDL_Rect src = {
+                  .x = x,
+                  .y = 0,
+                  .w = size,
+                  .h = size,
+  };
+
+  SDL_Rect dest = {
+                  .x = asteroid->pos.x,
+                  .y = asteroid->pos.y,
+                  .w = size,
+                  .h = size,
+  };
+
+  if (keyframe) {
+    asteroid->tick = asteroid->tick/k < asteroid->frames ? asteroid->tick + 1 : 0;
+  }
+
+  SDL_RenderCopy(ren, asteroid->texture, &src, &dest);
+}
+
 int main()
 {
   SDL_Window* win;
@@ -253,15 +317,19 @@ int main()
   Ship ship = init_ship(ship_pos, ren);
   Explosions explosions;
 
+  // TODO: refactor
   SDL_Texture* explosion_a = zxc_load_texture("images/explosions/type_A.png", ren);
   SDL_Texture* explosion_b = zxc_load_texture("images/explosions/type_B.png", ren);
   SDL_Texture* explosion_c = zxc_load_texture("images/explosions/type_C.png", ren);
-
 
   Vec epos = {100,100};
   create_explosion(&explosions, explosion_a, 50, 30, epos);
   create_explosion(&explosions, explosion_b, 192, 64, epos);
   create_explosion(&explosions, explosion_c, 256, 48, epos);
+
+  SDL_Texture* asteroid_texture = zxc_load_texture("images/rock.png", ren);
+  Asteroid ast = init_asteroid(asteroid_texture);
+  Asteroid ast2 = init_asteroid(asteroid_texture);
 
   // FPS meter
   uint frame_count = 0;
@@ -305,6 +373,8 @@ int main()
 
     // UPDATE
     update_ship(&input, &ship, speed);
+    update_asteroid(&ast, speed);
+    update_asteroid(&ast2, speed);
 
     // RENDER
     SDL_RenderClear(ren);
@@ -316,6 +386,9 @@ int main()
     }
 
     render_ship(&ship, ren);
+
+    render_asteroid(&ast, keyframe, ren);
+    render_asteroid(&ast2, keyframe, ren);
 
     SDL_RenderPresent(ren);
   }
