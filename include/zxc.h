@@ -85,4 +85,5 @@ Vec vec_limit(float f, Vec vec)
   }
 }
 
+const double toRad = 0.01745329252;
 #endif

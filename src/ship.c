@@ -5,8 +5,6 @@
 
 #define SSIZE 48 // size of ship sprite
 
-static const double toRad = 0.01745329252;
-
 typedef struct {
   SDL_Texture* texture;
   double rotation;

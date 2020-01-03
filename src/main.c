@@ -10,6 +10,7 @@
 #include "input/keyboard.c"
 #include "entity/explosion.c"
 #include "entity/asteroid.c"
+#include "entity/projectile.c"
 
 const int win_width = 1200;
 const int win_height = 800;
@@ -79,6 +80,10 @@ int main()
   create_asteroid(asteroid_texture, asteroids);
   create_asteroid(asteroid_texture, asteroids);
 
+  // TODO: refactor
+  SDL_Texture* proj_texture = zxc_load_texture("images/spaceship.png", ren);
+  Projectiles* projectiles = NULL;
+
   // FPS meter
   uint frame_count = 0;
   uint last_time = SDL_GetTicks();
@@ -115,6 +120,11 @@ int main()
       case SDL_KEYUP:
       case SDL_KEYDOWN: {
         handle_keyboard(&event, &input);
+        switch (event.key.keysym.sym) {
+        case SDLK_SPACE: {
+          projectiles = create_projectile(projectiles, ship.pos, ship.rotation);
+          } break;
+        }
       } break;
       } break;
     }
@@ -126,6 +136,8 @@ int main()
       update_asteroid(&asteroids->asteroids[i], speed, win_width, win_height);
     }
 
+    projectiles = update_projectiles(projectiles, win_width, win_height, speed);
+
     // RENDER
     SDL_RenderClear(ren);
     zxc_render_texture_fill(bg, ren);
@@ -134,6 +146,8 @@ int main()
       if (render_explosion(&explosions.arr[i], keyframe, ren) == 0)
         destroy_explosion(&explosions.arr[i]);
     }
+
+    render_projectiles(projectiles, proj_texture, ren);
 
     render_ship(&ship, ren);
 
