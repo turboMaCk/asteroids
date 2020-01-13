@@ -8,9 +8,9 @@
 #include "input.h"
 #include "ship.c"
 #include "input/keyboard.c"
-#include "entity/explosion.c"
-#include "entity/asteroid.c"
-#include "entity/projectile.c"
+#include "projectile.c"
+#include "asteroid.c"
+#include "explosion.c"
 
 const int win_width = 1200;
 const int win_height = 800;

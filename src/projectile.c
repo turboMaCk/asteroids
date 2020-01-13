@@ -13,7 +13,8 @@ typedef struct {
   struct Projectiles* tail;
 } Projectiles;
 
-Projectiles* create_projectile(Projectiles* projectiles, Vec pos, double angle) {
+Projectiles* create_projectile(Projectiles* projectiles, Vec pos, double angle)
+{
   int id = projectiles == NULL ? 1 : projectiles->head.id + 1;
   Projectile proj = {id, pos, angle};
 
@@ -27,37 +28,38 @@ Projectiles* create_projectile(Projectiles* projectiles, Vec pos, double angle) 
 
 Projectiles* update_projectiles(Projectiles* projectiles, uint win_width, uint win_height, float speed)
 {
-  Projectiles *result = NULL, **curr = &result;
+  Projectiles* new_head = NULL;
+  Projectiles* prev = NULL;
 
   while (projectiles != NULL) {
-    Projectile projectile = projectiles->head;
+    Projectile* projectile = &projectiles->head;
+    Projectiles* next = (Projectiles*) projectiles->tail;
+
+    // calculate new position
     Vec thrust_vec = {
-                        .x = (15 * sin(projectile.rotation * toRad)) / speed,
-                        .y = (-15 * cos(projectile.rotation * toRad)) / speed,
+                        .x = (10 * sin(projectile->rotation * toRad)) / speed,
+                        .y = (-10 * cos(projectile->rotation * toRad)) / speed,
     };
+    projectile->pos = vec_add(projectile->pos, thrust_vec);
 
-    bool doClean = false;
-    if (projectile.pos.x > -10 &&
-        projectile.pos.x < win_width &&
-        projectile.pos.y > -10 &&
-        projectile.pos.y < win_height) {
-      *curr = (Projectiles*) malloc(sizeof(Projectiles));
-      (*curr)->head = projectile;
-      (*curr)->head.pos = vec_add(projectile.pos, thrust_vec);
-      (*curr)->tail = NULL;
-      curr = (Projectiles**) &((*curr)->tail);
+    // Check if projectile is on screen
+    if (projectile->pos.x > -10 &&
+        projectile->pos.x < win_width &&
+        projectile->pos.y > -10 &&
+        projectile->pos.y < win_height) {
+      if (new_head == NULL) new_head = projectiles;
+      if (prev != NULL) prev->tail = (struct Projectiles*) projectiles;
+
+      prev = projectiles;
     } else {
-      doClean = true;
-    }
-
-    projectiles = (Projectiles*) projectiles->tail;
-
-    if (doClean) {
+      if (next == NULL && prev != NULL) prev->tail = NULL;
       free(projectiles);
     }
+
+    projectiles = next;
   }
 
-  return result;
+  return new_head;
 }
 
 void render_projectiles(Projectiles* projectiles, SDL_Texture* texture, SDL_Renderer* ren)
