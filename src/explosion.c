@@ -55,8 +55,8 @@ int render_explosion(Explosion* explosion, bool keyframe, SDL_Renderer* ren)
   SDL_Rect src = {x, 0, explosion->size, explosion->size};
 
   SDL_Rect dest = {
-                   .x = explosion->position.x,
-                   .y = explosion->position.y,
+                   .x = explosion->position.x - explosion->size/2,
+                   .y = explosion->position.y - explosion->size/2,
                    .w = explosion->size,
                    .h = explosion->size
   };
