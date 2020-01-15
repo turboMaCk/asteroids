@@ -90,15 +90,23 @@ int main()
   float speed = 3;
   uint time;
   bool keyframe = true;
+  uint fps_tick = 0;
 
   while (running) {
     ++frame_count;
     time = SDL_GetTicks();
 
-    if (last_time + 1000 <= time) {
+    if (last_time + 10 <= time) {
       last_time = time;
-      speed = ((float) frame_count)/60;
-      SDL_Log("FPS: %d speed: %f\n", frame_count, speed);
+      speed = ((float) frame_count)/0.6;
+
+      fps_tick++;
+      // LOG FPS
+      if (fps_tick == 100) {
+        printf("FPS: %d\n", (frame_count * 60));
+        fps_tick = 0;
+      }
+
       frame_count = 0;
     }
 
