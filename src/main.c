@@ -146,6 +146,14 @@ int main()
 
     projectiles = update_projectiles(projectiles, win_width, win_height, speed);
 
+    {
+      Projectiles* proj = projectiles;
+      while (proj != NULL) {
+        projectile_colide_asteroids(asteroids, proj->head.pos);
+        proj = (Projectiles*) proj->tail;
+      }
+    }
+
     // RENDER
     SDL_RenderClear(ren);
     zxc_render_texture_fill(bg, ren);

@@ -1,6 +1,7 @@
 #include <SDL2/SDL.h>
 #include <stdbool.h>
 #include <zxc.h>
+#include <math.h>
 
 #define MAX_ASTEROIDS 64
 
@@ -48,6 +49,7 @@ void create_asteroid(SDL_Texture* texture, Asteroids* asteroids) {
 
 void update_asteroid(Asteroid* asteroid, float speed, uint width, uint height)
 {
+  // skip if asteroid is destroyed
   if (asteroid->destroyed) return;
 
   asteroid->pos = vec_add(asteroid->pos, vec_scale(1/speed, asteroid->vel));
@@ -68,6 +70,7 @@ void update_asteroid(Asteroid* asteroid, float speed, uint width, uint height)
 }
 
 void render_asteroid(Asteroid* asteroid, bool keyframe, SDL_Renderer* ren) {
+  if (asteroid->destroyed == true) return;
   uint size = asteroid->radius*2;
   uint k = 5;
   uint x = (asteroid->tick/k)*size;
@@ -90,4 +93,29 @@ void render_asteroid(Asteroid* asteroid, bool keyframe, SDL_Renderer* ren) {
   }
 
   SDL_RenderCopy(ren, asteroid->texture, &src, &dest);
+}
+
+
+bool projectile_colide_asteroids(Asteroids* asteroids, Vec vec)
+{
+  Asteroid *asteroid = asteroids->asteroids;
+
+  for (uint i = 0; i < asteroids->size; i++) {
+    // skip destroyed
+    if (asteroid->destroyed != true) {
+      Vec apos = asteroid->pos;
+      uint r = asteroid->radius;
+
+      // test collision
+      if ((powf(apos.x - vec.x, 2) + powf(apos.y - vec.y, 2)) <= r*r ) {
+        asteroid->destroyed = true;
+        return true;
+      }
+    }
+
+    // next asteroid
+    asteroid++;
+  }
+
+  return false;
 }
