@@ -20,7 +20,7 @@ Ship init_ship(Vec pos, SDL_Renderer* ren)
   double rotation_mom = 0;
   Vec vel = { 0,0 };
 
-  Ship ship = {texture, rotation ,rotation_mom, pos, vel};
+  Ship ship = {texture, rotation, rotation_mom, pos, vel};
   return ship;
 }
 
@@ -51,13 +51,13 @@ void update_ship(Input* input, Ship* ship, float speed, uint win_width, uint win
   ship->pos.x += ship->vel.x/speed;
   ship->pos.y += ship->vel.y/speed;
 
-  if (ship->pos.x > win_width) {
+  if (ship->pos.x > win_width + SSIZE) {
     ship->pos.x = -SSIZE;
   } else if (ship->pos.x < -SSIZE) {
     ship->pos.x = win_width;
   }
 
-  if (ship->pos.y > win_height) {
+  if (ship->pos.y > win_height + SSIZE) {
     ship->pos.y = -SSIZE;
   } else if (ship->pos.y < -SSIZE) {
     ship->pos.y = win_height;
@@ -74,8 +74,8 @@ void render_ship(Ship* ship, SDL_Renderer* ren)
     };
 
     SDL_Rect dest = {
-                     .x = (int) ship->pos.x,
-                     .y = (int) ship->pos.y,
+                     .x = (int) ship->pos.x - 19,
+                     .y = (int) ship->pos.y - 19,
                      .w = 38,
                      .h = 38,
     };

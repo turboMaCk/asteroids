@@ -44,9 +44,9 @@ Projectiles* update_projectiles(Projectiles* projectiles, uint win_width, uint w
 
     // Check if projectile is on screen
     if (projectile->pos.x > -10 &&
-        projectile->pos.x < win_width &&
+        projectile->pos.x < win_width + 10 &&
         projectile->pos.y > -10 &&
-        projectile->pos.y < win_height) {
+        projectile->pos.y < win_height + 10) {
       if (new_head == NULL) new_head = projectiles;
       if (prev != NULL) prev->tail = (struct Projectiles*) projectiles;
 
@@ -75,8 +75,8 @@ void render_projectiles(Projectiles* projectiles, SDL_Texture* texture, SDL_Rend
     };
 
     SDL_Rect dest = {
-                    .x = projectile.pos.x,
-                    .y = projectile.pos.y,
+                    .x = projectile.pos.x - 2,
+                    .y = projectile.pos.y - 5,
                     .w = 5,
                     .h = 11
     };

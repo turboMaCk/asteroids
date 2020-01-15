@@ -7,7 +7,7 @@
 
 #include "input.h"
 #include "ship.c"
-#include "input/keyboard.c"
+#include "keyboard.c"
 #include "projectile.c"
 #include "asteroid.c"
 #include "explosion.c"

@@ -1,5 +1,5 @@
 #include <SDL2/SDL.h>
-#include "../input.h"
+#include "input.h"
 
 void handle_keyboard(SDL_Event* event, Input* input)
 {
