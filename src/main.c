@@ -6,11 +6,10 @@
 #include <time.h>
 
 #include "input.h"
-#include "ship.c"
-#include "keyboard.c"
-#include "projectile.c"
-#include "asteroid.c"
-#include "explosion.c"
+#include "ship.h"
+#include "projectiles.h"
+#include "asteroids.h"
+#include "explosions.h"
 
 const int win_width = 1200;
 const int win_height = 800;
@@ -145,14 +144,7 @@ int main()
     }
 
     projectiles = update_projectiles(projectiles, win_width, win_height, speed);
-
-    {
-      Projectiles* proj = projectiles;
-      while (proj != NULL) {
-        projectile_colide_asteroids(asteroids, proj->head.pos);
-        proj = (Projectiles*) proj->tail;
-      }
-    }
+    projectiles = colide_asteroids(asteroids, projectiles);
 
     // RENDER
     SDL_RenderClear(ren);

@@ -2,16 +2,7 @@
 #include <zxc.h>
 
 #include "input.h"
-
-#define SSIZE 48 // size of ship sprite
-
-typedef struct {
-  SDL_Texture* texture;
-  double rotation;
-  double rotation_mom;
-  Vec pos;
-  Vec vel;
-} Ship;
+#include "ship.h"
 
 Ship init_ship(Vec pos, SDL_Renderer* ren)
 {
