@@ -30,7 +30,7 @@ void create_explosion(Explosions* explosions, Vec pos)
   SDL_Texture* texture;
   uint size, duration;
 
-  //TODO: fix
+  //TODO: add enum to pick explosion version
   if (0) {
     size = 50;
     duration = 30;
@@ -46,12 +46,12 @@ void create_explosion(Explosions* explosions, Vec pos)
   }
 
   uint loc = explosions->size;
+  Explosion explosion = {texture, 0, size, duration, pos, false};
 
-  if (loc >= sizeof(explosions->arr)/sizeof(explosions->arr[0])) {
+  if (loc >= MAX_EXPLOSIONS) {
 
     // put new item to first place so it's guaranteed to fit
-    Explosion expl = {texture, 0, size, duration, pos};
-    explosions->arr[0] = expl;
+    explosions->arr[0] = explosion;
     uint new_explosions_size = 1;
 
     // copy the rest in reverse order
@@ -59,7 +59,7 @@ void create_explosion(Explosions* explosions, Vec pos)
     for (uint i = MAX_EXPLOSIONS - 1; i > 0; --i) {
 
       // THIS MIGHT OVERWRITE SOME EXPLOSIONS DATA
-      if (explosions->arr[i].texture != NULL) {
+      if (!explosions->arr[i].destroyed) {
         explosions->arr[current_index] = explosions->arr[i];
         new_explosions_size++;
         current_index++;
@@ -67,15 +67,14 @@ void create_explosion(Explosions* explosions, Vec pos)
     }
     explosions->size = new_explosions_size;
   } else {
-    Explosion explosion = {texture, 0, size, duration, pos};
     explosions->arr[loc] = explosion;
     explosions->size++;
   }
 }
 
-int render_explosion(Explosion* explosion, bool keyframe, SDL_Renderer* ren)
+void render_explosion(Explosion* explosion, bool keyframe, SDL_Renderer* ren)
 {
-  if (explosion->texture == NULL) return 0;
+  if (explosion->destroyed) return;
 
   int x = explosion->tick * explosion->size;
   SDL_Rect src = {x, 0, explosion->size, explosion->size};
@@ -90,17 +89,14 @@ int render_explosion(Explosion* explosion, bool keyframe, SDL_Renderer* ren)
   SDL_RenderCopy(ren, explosion->texture, &src, &dest);
 
   if (keyframe) {
-    if (explosion->tick < explosion->duration ) {
-        explosion->tick += 1;
-    } else {
-        explosion->tick = 0;
+    if (explosion->tick < explosion->duration) {
+      explosion->tick += 1;
+    }
+    else if (explosion->duration == explosion->tick) {
+      explosion->destroyed=true;
+    }
+    else {
+      explosion->tick = 0;
     }
   }
-
-  return explosion->duration - explosion->tick;
-}
-
-void destroy_explosion(Explosion* explosion)
-{
-  explosion->texture = NULL;
 }

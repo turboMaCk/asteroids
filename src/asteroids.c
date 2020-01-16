@@ -5,10 +5,12 @@
 #include <zxc.h>
 #include <math.h>
 
-Asteroids* init_asteroids()
+Asteroids* init_asteroids(SDL_Renderer* ren)
 {
+  SDL_Texture* texture = zxc_load_texture("images/rock.png", ren);
   Asteroids* asteroids = malloc(sizeof(Asteroids));
   asteroids->size = 0;
+  asteroids->texture = texture;
 
   return asteroids;
 }
@@ -18,15 +20,14 @@ void destory_asteroids(Asteroids* asteroids)
   free(asteroids);
 }
 
-void create_asteroid(SDL_Texture* texture, Asteroids* asteroids)
+void create_asteroid(Asteroids* asteroids, Vec pos)
 {
-  Vec pos = {200,300};
   int vx = (rand()%10) + 1;
   int vy = (rand()%10) + 1;
   Vec vel = {vx,vy};
 
   // TODO: hardcoded radius
-  Asteroid asteroid = {texture, 32, 0, 16, false, pos, vel};
+  Asteroid asteroid = {asteroids->texture, 32, 0, 16, false, pos, vel};
 
   if (asteroids->size < MAX_ASTEROIDS) {
     asteroids->asteroids[asteroids->size++] = asteroid;
