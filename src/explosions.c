@@ -17,6 +17,15 @@ Explosions* init_explosions(SDL_Renderer* ren)
   return res;
 }
 
+void destroy_explosions(Explosions* explosions)
+{
+  SDL_DestroyTexture(explosions->texture_a);
+  SDL_DestroyTexture(explosions->texture_b);
+  SDL_DestroyTexture(explosions->texture_c);
+
+  free(explosions);
+}
+
 /* NEW Explosion is always created
    If there is not available slot for new explosion
    new explosion is assigned to first available slot
@@ -71,31 +80,34 @@ void create_explosion(Explosions* explosions, Vec pos)
   }
 }
 
-void render_explosion(Explosion* explosion, bool keyframe, SDL_Renderer* ren)
+void render_explosions(Explosions* explosions, bool keyframe, SDL_Renderer* ren)
 {
-  if (explosion->destroyed) return;
+  for (uint i = 0; i < explosions->size; ++i) {
+    Explosion* explosion = &explosions->arr[i];
+    if (explosion->destroyed) return;
 
-  int x = explosion->tick * explosion->size;
-  SDL_Rect src = {x, 0, explosion->size, explosion->size};
+    int x = explosion->tick * explosion->size;
+    SDL_Rect src = {x, 0, explosion->size, explosion->size};
 
-  SDL_Rect dest = {
-                   .x = explosion->position.x - explosion->size/2,
-                   .y = explosion->position.y - explosion->size/2,
-                   .w = explosion->size,
-                   .h = explosion->size
-  };
+    SDL_Rect dest = {
+                     .x = explosion->position.x - explosion->size/2,
+                     .y = explosion->position.y - explosion->size/2,
+                     .w = explosion->size,
+                     .h = explosion->size
+    };
 
-  SDL_RenderCopy(ren, explosion->texture, &src, &dest);
+    SDL_RenderCopy(ren, explosion->texture, &src, &dest);
 
-  if (keyframe) {
-    if (explosion->tick < explosion->duration) {
-      explosion->tick += 1;
-    }
-    else if (explosion->duration == explosion->tick) {
-      explosion->destroyed=true;
-    }
-    else {
-      explosion->tick = 0;
+    if (keyframe) {
+      if (explosion->tick < explosion->duration) {
+        explosion->tick += 1;
+      }
+      else if (explosion->duration == explosion->tick) {
+        explosion->destroyed=true;
+      }
+      else {
+        explosion->tick = 0;
+      }
     }
   }
 }

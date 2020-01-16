@@ -20,8 +20,8 @@ typedef struct {
 
 typedef struct {
   uint size;
-  Asteroid asteroids[MAX_ASTEROIDS];
   SDL_Texture* texture;
+  Asteroid asteroids[MAX_ASTEROIDS];
 } Asteroids;
 
 Asteroids* init_asteroids(SDL_Renderer* ren)

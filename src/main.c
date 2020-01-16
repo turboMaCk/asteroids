@@ -76,7 +76,7 @@ int main()
   uint fps_tick = 0;
 
   while (running) {
-    ++frame_count;
+    frame_count++;
     time = SDL_GetTicks();
 
     if (last_time + 10 <= time) {
@@ -143,11 +143,7 @@ int main()
 
     render_projectiles(projectiles, proj_texture, ren);
     render_ship(&ship, ren);
-
-    // TODO maybe we should loop within the render function
-    for (uint i = 0; i < explosions->size; ++i) {
-      render_explosion(&explosions->arr[i], keyframe, ren);
-    }
+    render_explosions(explosions, keyframe, ren);
 
     for (uint i = 0; i < asteroids->size; ++i) {
         render_asteroid(&asteroids->asteroids[i], keyframe, ren);
