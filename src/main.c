@@ -19,7 +19,7 @@ const int win_height = 800;
 int main()
 {
   // seed random
-  srand ( time(NULL) );
+  srand(time(NULL));
 
   SDL_Window* win;
   SDL_Renderer* ren;
@@ -61,10 +61,6 @@ int main()
   Asteroids* asteroids = init_asteroids(ren);
 
   Vec pos = {200,200};
-  create_asteroid(asteroids, pos);
-  create_asteroid(asteroids, pos);
-  create_asteroid(asteroids, pos);
-  create_asteroid(asteroids, pos);
   create_asteroid(asteroids, pos);
 
   // TODO: refactor

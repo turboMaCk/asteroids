@@ -26,13 +26,29 @@ void create_asteroid(Asteroids* asteroids, Vec pos)
   int vy = (rand()%10) + 1;
   Vec vel = {vx,vy};
 
+  uint loc = asteroids->size;
   // TODO: hardcoded radius
   Asteroid asteroid = {asteroids->texture, 32, 0, 16, false, pos, vel};
 
-  if (asteroids->size < MAX_ASTEROIDS) {
-    asteroids->asteroids[asteroids->size++] = asteroid;
+  // THIS MIGHT OVERWRITE SOME EXPLOSIONS DATA
+  if (asteroids->size >= MAX_ASTEROIDS) {
+    //put new item to first place
+    asteroids->asteroids[0] = asteroid;
+    asteroids->size = 1;
+
+    // copy the rest
+    uint current_index = 1;
+    for (uint i = 1; i < MAX_ASTEROIDS; ++i) {
+      if (!asteroids->asteroids[i].destroyed) {
+        asteroids->asteroids[current_index] = asteroids->asteroids[i];
+        asteroids->asteroids[i].destroyed = true;
+        asteroids->size++;
+        current_index++;
+      }
+    }
   } else {
-    // TODO: clearing code
+    asteroids->asteroids[loc] = asteroid;
+    asteroids->size++;
   }
 }
 

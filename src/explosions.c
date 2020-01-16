@@ -5,24 +5,17 @@ Explosions* init_explosions(SDL_Renderer* ren)
   Explosions* res = malloc(sizeof(Explosions));
   res->size = 0;
 
-  {
-    // textures;
-    SDL_Texture* tex_a = zxc_load_texture("images/explosions/type_A.png", ren);
-    SDL_Texture* tex_b = zxc_load_texture("images/explosions/type_B.png", ren);
-    SDL_Texture* tex_c = zxc_load_texture("images/explosions/type_C.png", ren);
+  // textures;
+  SDL_Texture* tex_a = zxc_load_texture("images/explosions/type_A.png", ren);
+  SDL_Texture* tex_b = zxc_load_texture("images/explosions/type_B.png", ren);
+  SDL_Texture* tex_c = zxc_load_texture("images/explosions/type_C.png", ren);
 
-
-    res->texture_a = tex_a;
-    res->texture_b = tex_b;
-    res->texture_c = tex_c;
-  }
+  res->texture_a = tex_a;
+  res->texture_b = tex_b;
+  res->texture_c = tex_c;
 
   return res;
 }
-
-  /* create_explosion(explosions, explosion_a, 50, 30, epos); */
-  /* create_explosion(explosions, explosion_b, 192, 64, epos); */
-  /* create_explosion(explosions, explosion_c, 256, 48, epos); */
 
 void create_explosion(Explosions* explosions, Vec pos)
 {
@@ -31,6 +24,7 @@ void create_explosion(Explosions* explosions, Vec pos)
   uint size, duration;
 
   //TODO: add enum to pick explosion version
+  // small one
   if (0) {
     size = 50;
     duration = 30;
@@ -40,32 +34,31 @@ void create_explosion(Explosions* explosions, Vec pos)
     duration = 64;
     texture = explosions->texture_b;
   } else {
-    size = 192;
-    duration = 64;
+    size = 256;
+    duration = 48;
     texture = explosions->texture_c;
   }
 
   uint loc = explosions->size;
   Explosion explosion = {texture, 0, size, duration, pos, false};
 
+  // THIS MIGHT OVERWRITE SOME EXPLOSIONS DATA
   if (loc >= MAX_EXPLOSIONS) {
-
     // put new item to first place so it's guaranteed to fit
     explosions->arr[0] = explosion;
-    uint new_explosions_size = 1;
+    explosions->size = 1;
 
-    // copy the rest in reverse order
+    // copy the rest in place
     uint current_index = 1;
-    for (uint i = MAX_EXPLOSIONS - 1; i > 0; --i) {
-
-      // THIS MIGHT OVERWRITE SOME EXPLOSIONS DATA
+    for (uint i = 1; i < MAX_EXPLOSIONS; ++i) {
       if (!explosions->arr[i].destroyed) {
         explosions->arr[current_index] = explosions->arr[i];
-        new_explosions_size++;
+        explosions->arr[i].destroyed = true;
+        explosions->size++;
         current_index++;
       }
     }
-    explosions->size = new_explosions_size;
+
   } else {
     explosions->arr[loc] = explosion;
     explosions->size++;
