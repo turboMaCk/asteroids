@@ -1,5 +1,11 @@
 #include "projectiles.h"
 
+#include <SDL2/SDL.h>
+#include <zxc.h>
+#include <stdbool.h>
+#include "asteroids.h"
+#include "explosions.h"
+
 Projectiles* create_projectile(Projectiles* projectiles, Vec pos, double angle)
 {
   int id = projectiles == NULL ? 1 : projectiles->head.id + 1;
@@ -13,7 +19,7 @@ Projectiles* create_projectile(Projectiles* projectiles, Vec pos, double angle)
   return new_projectiles;
 }
 
-Projectiles* colide_asteroids(Asteroids* asteroids, Projectiles* projectiles)
+Projectiles* colide_asteroids(Asteroids* asteroids, Projectiles* projectiles, Explosions* explosions)
 {
   Projectiles* new_head = NULL;
   Projectiles* prev = NULL;
@@ -22,18 +28,18 @@ Projectiles* colide_asteroids(Asteroids* asteroids, Projectiles* projectiles)
     Projectiles* next = (Projectiles*) projectiles->tail;
 
     // Check if projectile is on screen
-    bool did_colide = !projectile_colide_asteroids(asteroids, projectiles->head.pos);
+    Vec position = projectiles->head.pos;
 
-    if (did_colide) {
+    if (!projectile_colide_asteroids(asteroids, position)) {
       if (new_head == NULL) new_head = projectiles;
       if (prev != NULL) prev->tail = (struct Projectiles*) projectiles;
 
-      /* create_explosion(explosions, SDL_Texture *texture, uint size, uint duration, Vec pos) */
 
       prev = projectiles;
     } else {
       if (next == NULL && prev != NULL) prev->tail = NULL;
       free(projectiles);
+      create_explosion(explosions, position);
     }
 
     projectiles = next;
@@ -53,8 +59,8 @@ Projectiles* update_projectiles(Projectiles* projectiles, uint win_width, uint w
 
     // calculate new position
     Vec thrust_vec = {
-                        .x = (10 * sin(projectile->rotation * toRad)) / speed,
-                        .y = (-10 * cos(projectile->rotation * toRad)) / speed,
+                        .x = (20 * sin(projectile->rotation * toRad)) / speed,
+                        .y = (-20 * cos(projectile->rotation * toRad)) / speed,
     };
     projectile->pos = vec_add(projectile->pos, thrust_vec);
 

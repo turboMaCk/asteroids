@@ -1,5 +1,10 @@
 #include "asteroids.h"
 
+#include <SDL2/SDL.h>
+#include <stdbool.h>
+#include <zxc.h>
+#include <math.h>
+
 Asteroids* init_asteroids()
 {
   Asteroids* asteroids = malloc(sizeof(Asteroids));
@@ -82,17 +87,19 @@ void render_asteroid(Asteroid* asteroid, bool keyframe, SDL_Renderer* ren)
 bool projectile_colide_asteroids(Asteroids* asteroids, Vec vec)
 {
   Asteroid *asteroid = asteroids->asteroids;
+  bool res = false;
 
   for (uint i = 0; i < asteroids->size; i++) {
     // skip destroyed
-    if (asteroid->destroyed != true) {
+    if (!asteroid->destroyed) {
       Vec apos = asteroid->pos;
       uint r = asteroid->radius;
 
       // test collision
       if ((powf(apos.x - vec.x, 2) + powf(apos.y - vec.y, 2)) <= r*r ) {
         asteroid->destroyed = true;
-        return true;
+        res = true;
+        break;
       }
     }
 
@@ -100,5 +107,5 @@ bool projectile_colide_asteroids(Asteroids* asteroids, Vec vec)
     asteroid++;
   }
 
-  return false;
+  return res;
 }

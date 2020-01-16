@@ -5,6 +5,7 @@
 #include <zxc.h>
 #include <stdbool.h>
 #include "asteroids.h"
+#include "explosions.h"
 
 typedef struct {
   int id;
@@ -20,7 +21,7 @@ typedef struct {
 
 Projectiles* create_projectile(Projectiles* projectiles, Vec pos, double angle)
   ;
-Projectiles* colide_asteroids(Asteroids* asteroids, Projectiles* projectiles)
+Projectiles* colide_asteroids(Asteroids* asteroids, Projectiles* projectiles, Explosions* explosions)
   ;
 Projectiles* update_projectiles(Projectiles* projectiles, uint win_width, uint win_height, float speed)
   ;

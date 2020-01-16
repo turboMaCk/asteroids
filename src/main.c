@@ -57,18 +57,8 @@ int main()
   // Entities
   Vec ship_pos = { (win_width - SSIZE)/2, (win_height - SSIZE)/2 };
   Ship ship = init_ship(ship_pos, ren);
-  Explosions explosions;
+  Explosions* explosions = init_explosions(ren);
   Asteroids* asteroids = init_asteroids();
-
-  // TODO: refactor
-  SDL_Texture* explosion_a = zxc_load_texture("images/explosions/type_A.png", ren);
-  SDL_Texture* explosion_b = zxc_load_texture("images/explosions/type_B.png", ren);
-  SDL_Texture* explosion_c = zxc_load_texture("images/explosions/type_C.png", ren);
-
-  Vec epos = {100,100};
-  create_explosion(&explosions, explosion_a, 50, 30, epos);
-  create_explosion(&explosions, explosion_b, 192, 64, epos);
-  create_explosion(&explosions, explosion_c, 256, 48, epos);
 
   // TODO: refactor
   SDL_Texture* asteroid_texture = zxc_load_texture("images/rock.png", ren);
@@ -144,15 +134,15 @@ int main()
     }
 
     projectiles = update_projectiles(projectiles, win_width, win_height, speed);
-    projectiles = colide_asteroids(asteroids, projectiles);
+    projectiles = colide_asteroids(asteroids, projectiles, explosions);
 
     // RENDER
     SDL_RenderClear(ren);
     zxc_render_texture_fill(bg, ren);
 
-    for (uint i = 0; i < explosions.size; ++i) {
-      if (render_explosion(&explosions.arr[i], keyframe, ren) == 0)
-        destroy_explosion(&explosions.arr[i]);
+    for (uint i = 0; i < explosions->size; ++i) {
+      if (render_explosion(&explosions->arr[i], keyframe, ren) == 0)
+        destroy_explosion(&explosions->arr[i]);
     }
 
     render_projectiles(projectiles, proj_texture, ren);

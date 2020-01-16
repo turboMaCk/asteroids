@@ -1,4 +1,4 @@
-#include "zxc.h"
+#include <zxc.h>
 
 void zxc_log_sdl_err(const char* message)
 {
