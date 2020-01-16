@@ -1,10 +1,8 @@
-#include "projectiles.h"
+#include "entities.h"
 
 #include <SDL2/SDL.h>
 #include <zxc.h>
 #include <stdbool.h>
-#include "asteroids.h"
-#include "explosions.h"
 
 Projectiles* create_projectile(Projectiles* projectiles, Vec pos, double angle)
 {
@@ -39,7 +37,26 @@ Projectiles* colide_asteroids(Asteroids* asteroids, Projectiles* projectiles, Ex
     } else {
       if (next == NULL && prev != NULL) prev->tail = NULL;
       free(projectiles);
-      create_explosion(explosions, position);
+      ExplosionType t;
+      switch ((int) rand() % 3 + 1) {
+      case 1: {
+        t = ExplosionBig;
+        printf("big\n");
+      } break;
+      case 2: {
+        t = ExplosionHuge;
+        printf("huge\n");
+      } break;
+      case 3: {
+        t = ExplosionSmall;
+        printf("small\n");
+      } break;
+      default: {
+        t = ExplosionBig;
+        printf("default case reached\n");
+      }
+      }
+      create_explosion(explosions, ExplosionBig, position);
     }
 
     projectiles = next;

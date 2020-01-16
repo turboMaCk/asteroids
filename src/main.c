@@ -7,9 +7,7 @@
 
 #include "input.h"
 #include "ship.h"
-#include "projectiles.h"
-#include "asteroids.h"
-#include "explosions.h"
+#include "entities.h"
 
 const int win_width = 1200;
 const int win_height = 800;
@@ -62,6 +60,13 @@ int main()
 
   Vec pos = {200,200};
   create_asteroid(asteroids, pos);
+  create_asteroid(asteroids, pos);
+  create_asteroid(asteroids, pos);
+  create_asteroid(asteroids, pos);
+  create_asteroid(asteroids, pos);
+  create_asteroid(asteroids, pos);
+  create_asteroid(asteroids, pos);
+  create_asteroid(asteroids, pos);
 
   // TODO: refactor
   SDL_Texture* proj_texture = zxc_load_texture("images/spaceship.png", ren);
@@ -76,7 +81,7 @@ int main()
   uint fps_tick = 0;
 
   while (running) {
-    ++frame_count;
+    frame_count++;
     time = SDL_GetTicks();
 
     if (last_time + 10 <= time) {
@@ -122,30 +127,26 @@ int main()
 
     // UPDATE
     update_ship(&input, &ship, speed, win_width, win_height);
-
-    for (uint i = 0; i < asteroids->size; ++i) {
-      update_asteroid(&asteroids->asteroids[i], speed, win_width, win_height);
-    }
+    update_asteroids(asteroids, speed, win_width, win_height);
 
     projectiles = update_projectiles(projectiles, win_width, win_height, speed);
     projectiles = colide_asteroids(asteroids, projectiles, explosions);
+
+    // Check player & asteroids collision
+
+    if (circle_colide_with_asteroids(asteroids, ship.pos, 24)) {
+      printf("Game over\n");
+      create_explosion(explosions, ExplosionHuge, ship.pos);
+    }
 
     // RENDER
     SDL_RenderClear(ren);
     zxc_render_texture_fill(bg, ren);
 
-    // TODO maybe we should loop within the render function
-    for (uint i = 0; i < explosions->size; ++i) {
-      render_explosion(&explosions->arr[i], keyframe, ren);
-    }
-
     render_projectiles(projectiles, proj_texture, ren);
-
+    render_asteroids(asteroids, keyframe, ren);
     render_ship(&ship, ren);
-
-    for (uint i = 0; i < asteroids->size; ++i) {
-        render_asteroid(&asteroids->asteroids[i], keyframe, ren);
-    }
+    render_explosions(explosions, keyframe, ren);
 
     SDL_RenderPresent(ren);
   }
