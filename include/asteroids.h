@@ -21,13 +21,14 @@ typedef struct {
 typedef struct {
   uint size;
   Asteroid asteroids[MAX_ASTEROIDS];
+  SDL_Texture* texture;
 } Asteroids;
 
-Asteroids* init_asteroids()
+Asteroids* init_asteroids(SDL_Renderer* ren)
   ;
 void destory_asteroids(Asteroids* asteroids)
   ;
-void create_asteroid(SDL_Texture* texture, Asteroids* asteroids)
+void create_asteroid(Asteroids* asteroids, Vec pos)
   ;
 void update_asteroid(Asteroid* asteroid, float speed, uint width, uint height)
   ;

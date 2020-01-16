@@ -13,6 +13,7 @@ typedef struct {
   uint size;
   uint duration;
   Vec position;
+  bool destroyed;
 } Explosion;
 
 typedef struct {
@@ -27,9 +28,7 @@ Explosions* init_explosions(SDL_Renderer* ren)
   ;
 void create_explosion(Explosions* explosions, Vec pos)
   ;
-int render_explosion(Explosion* explosion, bool keyframe, SDL_Renderer* ren)
-  ;
-void destroy_explosion(Explosion* explosion)
+void render_explosion(Explosion* explosion, bool keyframe, SDL_Renderer* ren)
   ;
 
 #endif // _EXLOSIONS_H_

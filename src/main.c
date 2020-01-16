@@ -19,7 +19,7 @@ const int win_height = 800;
 int main()
 {
   // seed random
-  srand ( time(NULL) );
+  srand(time(NULL));
 
   SDL_Window* win;
   SDL_Renderer* ren;
@@ -58,16 +58,10 @@ int main()
   Vec ship_pos = { (win_width - SSIZE)/2, (win_height - SSIZE)/2 };
   Ship ship = init_ship(ship_pos, ren);
   Explosions* explosions = init_explosions(ren);
-  Asteroids* asteroids = init_asteroids();
+  Asteroids* asteroids = init_asteroids(ren);
 
-  // TODO: refactor
-  SDL_Texture* asteroid_texture = zxc_load_texture("images/rock.png", ren);
-
-  create_asteroid(asteroid_texture, asteroids);
-  create_asteroid(asteroid_texture, asteroids);
-  create_asteroid(asteroid_texture, asteroids);
-  create_asteroid(asteroid_texture, asteroids);
-  create_asteroid(asteroid_texture, asteroids);
+  Vec pos = {200,200};
+  create_asteroid(asteroids, pos);
 
   // TODO: refactor
   SDL_Texture* proj_texture = zxc_load_texture("images/spaceship.png", ren);
@@ -140,9 +134,9 @@ int main()
     SDL_RenderClear(ren);
     zxc_render_texture_fill(bg, ren);
 
+    // TODO maybe we should loop within the render function
     for (uint i = 0; i < explosions->size; ++i) {
-      if (render_explosion(&explosions->arr[i], keyframe, ren) == 0)
-        destroy_explosion(&explosions->arr[i]);
+      render_explosion(&explosions->arr[i], keyframe, ren);
     }
 
     render_projectiles(projectiles, proj_texture, ren);
