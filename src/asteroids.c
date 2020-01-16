@@ -20,6 +20,9 @@ void destory_asteroids(Asteroids* asteroids)
   free(asteroids);
 }
 
+/* NEW Asteroids migght not be created
+   if there is no empty slot for it
+*/
 void create_asteroid(Asteroids* asteroids, Vec pos)
 {
   int vx = (rand()%10) + 1;
@@ -32,20 +35,26 @@ void create_asteroid(Asteroids* asteroids, Vec pos)
 
   // THIS MIGHT OVERWRITE SOME EXPLOSIONS DATA
   if (asteroids->size >= MAX_ASTEROIDS) {
-    //put new item to first place
-    asteroids->asteroids[0] = asteroid;
-    asteroids->size = 1;
-
-    // copy the rest
-    uint current_index = 1;
-    for (uint i = 1; i < MAX_ASTEROIDS; ++i) {
+    // reaorganize the array
+    uint current_index = 0;
+    for (uint i = 0; i < MAX_ASTEROIDS; ++i) {
       if (!asteroids->asteroids[i].destroyed) {
-        asteroids->asteroids[current_index] = asteroids->asteroids[i];
-        asteroids->asteroids[i].destroyed = true;
-        asteroids->size++;
+        if (i != current_index) {
+          asteroids->asteroids[current_index] = asteroids->asteroids[i];
+          asteroids->asteroids[i].destroyed = true;
+        }
+
         current_index++;
       }
     }
+
+    // Add new if there is a slot
+    if (current_index + 1 < MAX_ASTEROIDS) {
+      asteroids->asteroids[current_index] = asteroid;
+      current_index++;
+    }
+
+    asteroids->size = current_index;
   } else {
     asteroids->asteroids[loc] = asteroid;
     asteroids->size++;

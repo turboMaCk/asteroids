@@ -17,6 +17,12 @@ Explosions* init_explosions(SDL_Renderer* ren)
   return res;
 }
 
+/* NEW Explosion is always created
+   If there is not available slot for new explosion
+   new explosion is assigned to first available slot
+   and rest of the array is reorganized
+   from start to end
+ */
 void create_explosion(Explosions* explosions, Vec pos)
 {
   // Configure based on texture
