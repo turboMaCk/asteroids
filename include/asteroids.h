@@ -36,5 +36,7 @@ void render_asteroid(Asteroid* asteroid, bool keyframe, SDL_Renderer* ren)
   ;
 bool projectile_colide_asteroids(Asteroids* asteroids, Vec vec)
   ;
+bool colide_with_c_asteroids(Asteroids* asteroids, Vec pos, uint r)
+  ;
 
 #endif

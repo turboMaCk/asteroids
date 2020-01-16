@@ -135,3 +135,21 @@ bool projectile_colide_asteroids(Asteroids* asteroids, Vec vec)
 
   return res;
 }
+
+bool colide_with_c_asteroids(Asteroids* asteroids, Vec pos, uint r)
+{
+  for (uint i = 0; i < asteroids->size; i++) {
+    Asteroid a = asteroids->asteroids[i];
+
+    uint dx = a.pos.x - pos.x;
+    uint dy = a.pos.y - pos.y;
+
+    double distance = sqrt((double) (dx * dx + dy * dy));
+
+    if (distance < r + a.radius) {
+      return true;
+    }
+  }
+
+  return false;
+}

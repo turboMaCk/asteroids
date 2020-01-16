@@ -130,18 +130,24 @@ int main()
     projectiles = update_projectiles(projectiles, win_width, win_height, speed);
     projectiles = colide_asteroids(asteroids, projectiles, explosions);
 
+    // Check player & asteroids collision
+
+    if (colide_with_c_asteroids(asteroids, ship.pos, 24)) {
+      printf("Game over\n");
+      create_explosion(explosions, ship.pos);
+    }
+
     // RENDER
     SDL_RenderClear(ren);
     zxc_render_texture_fill(bg, ren);
+
+    render_projectiles(projectiles, proj_texture, ren);
+    render_ship(&ship, ren);
 
     // TODO maybe we should loop within the render function
     for (uint i = 0; i < explosions->size; ++i) {
       render_explosion(&explosions->arr[i], keyframe, ren);
     }
-
-    render_projectiles(projectiles, proj_texture, ren);
-
-    render_ship(&ship, ren);
 
     for (uint i = 0; i < asteroids->size; ++i) {
         render_asteroid(&asteroids->asteroids[i], keyframe, ren);
