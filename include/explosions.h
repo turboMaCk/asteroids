@@ -17,10 +17,15 @@ typedef struct {
 
 typedef struct {
   Explosion arr[MAX_EXPLOSIONS];
+  SDL_Texture* texture_a;
+  SDL_Texture* texture_b;
+  SDL_Texture* texture_c;
   uint size;
 } Explosions;
 
-void create_explosion(Explosions* explosions, SDL_Texture* texture, uint size, uint duration, Vec pos)
+Explosions* init_explosions(SDL_Renderer* ren)
+  ;
+void create_explosion(Explosions* explosions, Vec pos)
   ;
 int render_explosion(Explosion* explosion, bool keyframe, SDL_Renderer* ren)
   ;
