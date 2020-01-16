@@ -1,37 +1,20 @@
-#include <SDL2/SDL.h>
-#include <stdbool.h>
-#include <zxc.h>
-#include <math.h>
+#include "asteroids.h"
 
-#define MAX_ASTEROIDS 64
-
-typedef struct {
-  SDL_Texture* texture;
-  uint radius;
-  uint tick;
-  uint frames;
-  bool destroyed;
-  Vec pos;
-  Vec vel;
-} Asteroid;
-
-typedef struct {
-  uint size;
-  Asteroid asteroids[MAX_ASTEROIDS];
-} Asteroids;
-
-Asteroids* init_asteroids() {
+Asteroids* init_asteroids()
+{
   Asteroids* asteroids = malloc(sizeof(Asteroids));
   asteroids->size = 0;
 
   return asteroids;
 }
 
-void destory_asteroyds(Asteroids* asteroids) {
+void destory_asteroids(Asteroids* asteroids)
+{
   free(asteroids);
 }
 
-void create_asteroid(SDL_Texture* texture, Asteroids* asteroids) {
+void create_asteroid(SDL_Texture* texture, Asteroids* asteroids)
+{
   Vec pos = {200,300};
   int vx = (rand()%10) + 1;
   int vy = (rand()%10) + 1;
@@ -69,7 +52,8 @@ void update_asteroid(Asteroid* asteroid, float speed, uint width, uint height)
   }
 }
 
-void render_asteroid(Asteroid* asteroid, bool keyframe, SDL_Renderer* ren) {
+void render_asteroid(Asteroid* asteroid, bool keyframe, SDL_Renderer* ren)
+{
   if (asteroid->destroyed == true) return;
   uint size = asteroid->radius*2;
   uint k = 5;
@@ -94,7 +78,6 @@ void render_asteroid(Asteroid* asteroid, bool keyframe, SDL_Renderer* ren) {
 
   SDL_RenderCopy(ren, asteroid->texture, &src, &dest);
 }
-
 
 bool projectile_colide_asteroids(Asteroids* asteroids, Vec vec)
 {

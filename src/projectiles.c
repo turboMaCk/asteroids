@@ -1,17 +1,4 @@
-#include <SDL2/SDL.h>
-#include <zxc.h>
-#include <stdbool.h>
-
-typedef struct {
-  int id;
-  Vec pos;
-  double rotation;
-} Projectile;
-
-typedef struct {
-  Projectile head;
-  struct Projectiles* tail;
-} Projectiles;
+#include "projectiles.h"
 
 Projectiles* create_projectile(Projectiles* projectiles, Vec pos, double angle)
 {
@@ -24,6 +11,35 @@ Projectiles* create_projectile(Projectiles* projectiles, Vec pos, double angle)
   new_projectiles->tail = (struct Projectiles*) projectiles;
 
   return new_projectiles;
+}
+
+Projectiles* colide_asteroids(Asteroids* asteroids, Projectiles* projectiles)
+{
+  Projectiles* new_head = NULL;
+  Projectiles* prev = NULL;
+
+  while (projectiles != NULL) {
+    Projectiles* next = (Projectiles*) projectiles->tail;
+
+    // Check if projectile is on screen
+    bool did_colide = !projectile_colide_asteroids(asteroids, projectiles->head.pos);
+
+    if (did_colide) {
+      if (new_head == NULL) new_head = projectiles;
+      if (prev != NULL) prev->tail = (struct Projectiles*) projectiles;
+
+      /* create_explosion(explosions, SDL_Texture *texture, uint size, uint duration, Vec pos) */
+
+      prev = projectiles;
+    } else {
+      if (next == NULL && prev != NULL) prev->tail = NULL;
+      free(projectiles);
+    }
+
+    projectiles = next;
+  }
+
+  return new_head;
 }
 
 Projectiles* update_projectiles(Projectiles* projectiles, uint win_width, uint win_height, float speed)

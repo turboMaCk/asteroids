@@ -1,30 +1,48 @@
-INCDIR=include
-CC=gcc
-CFLAGS=-I$(INCDIR) -Wall -pedantic -Werror -Wshadow -Wstrict-aliasing -Wstrict-overflow
+# Compiler configuration
 
-ODIR=obj
-SRCDIR=src
-OUTDIR=build
+CC= gcc
+CFLAGS= \
+	-Wall \
+	-pedantic \
+	-Werror \
+	-Wshadow \
+	-Wstrict-aliasing \
+	-Wstrict-overflow \
+	-g
+
+# Directories
+
+INCDIR= include
+SRCDIR= src
+OUTDIR= build
+
+# Helper variables
+SOURCE= $(wildcard src/*.c)
+
+# Libraries
 
 LIBS=-lSDL2 -lSDL2_image -lm
 
-_DEPS=
-DEPS=$(patsubst %,$(INCDIR)/%,$(_DEPS))
+# Compile Objects
 
-_OBJ=main.o
+$(ODIR)/%.o: $(SOURCE)
+	$(CC) -c -o $@ $< $(CFLAGS) `sdl2-config --cflags --libs`
 
-OBJ=$(patsubst %,$(ODIR)/%,$(_OBJ))
+# Compile Binary
 
-$(ODIR)/%.o: $(SRCDIR)/%.c $(DEPS)
-	$(CC) `sdl2-config --cflags --libs` -c -o $@ $< $(CFLAGS)
+$(OUTDIR)/asteroids:
+	$(CC) -I$(INCDIR) $(LIBS) -I$(INCDIR) `sdl2-config --cflags --libs` $(SOURCE) -o $@
 
-main: $(OBJ)
-	$(CC) -o $(OUTDIR)/$@ $^ $(CFLAGS) $(LIBS)
+all: $(OUTDIRE)/asteroids
+
+# Compile and run
 
 .PHONY: run
-run: main
-	$(OUTDIR)/main
+run: $(OUTDIR)/asteroids
+	./$(OUTDIR)/asteroids
+
+# clean
 
 .PHONY: clean
 clean:
-	rm -f $(ODIR)/*.o $(SRCDIR)*~ core $(INCDIR)/*~
+	rm $(ODIR)/*.o $(OUTDIR)/asteroids
