@@ -62,53 +62,60 @@ void create_asteroid(Asteroids* asteroids, Vec pos)
   }
 }
 
-void update_asteroid(Asteroid* asteroid, float speed, uint width, uint height)
+void update_asteroids(Asteroids* asteroids, float speed, uint width, uint height)
 {
-  // skip if asteroid is destroyed
-  if (asteroid->destroyed) return;
+  for (uint i = 0; i < asteroids->size; ++i) {
+    Asteroid* asteroid = &asteroids->asteroids[i];
+    // skip if asteroid is destroyed
+    if (asteroid->destroyed) return;
 
-  asteroid->pos = vec_add(asteroid->pos, vec_scale(1/speed, asteroid->vel));
+    asteroid->pos = vec_add(asteroid->pos, vec_scale(1/speed, asteroid->vel));
 
-  int min_limit = (int)asteroid->radius*-2;
+    int min_limit = (int)asteroid->radius*-2;
 
-  if (asteroid->pos.y > height) {
-    asteroid->pos.y = min_limit;
-  } else if (asteroid->pos.y < min_limit) {
-    asteroid->pos.y = height;
-  }
+    if (asteroid->pos.y > height) {
+        asteroid->pos.y = min_limit;
+    } else if (asteroid->pos.y < min_limit) {
+        asteroid->pos.y = height;
+    }
 
-  if (asteroid->pos.x > width) {
-    asteroid->pos.x = min_limit;
-  } else if (asteroid->pos.x < min_limit) {
-    asteroid->pos.x = width;
+    if (asteroid->pos.x > width) {
+        asteroid->pos.x = min_limit;
+    } else if (asteroid->pos.x < min_limit) {
+        asteroid->pos.x = width;
+    }
   }
 }
 
-void render_asteroid(Asteroid* asteroid, bool keyframe, SDL_Renderer* ren)
+void render_asteroids(Asteroids* asteroids, bool keyframe, SDL_Renderer* ren)
 {
-  if (asteroid->destroyed == true) return;
-  uint size = asteroid->radius*2;
-  uint k = 5;
-  uint x = (asteroid->tick/k)*size;
-  SDL_Rect src = {
-                  .x = x,
-                  .y = 0,
-                  .w = size,
-                  .h = size,
-  };
+  for (uint i = 0; i < asteroids->size; ++i) {
+    Asteroid* asteroid = &asteroids->asteroids[i];
 
-  SDL_Rect dest = {
-                  .x = asteroid->pos.x,
-                  .y = asteroid->pos.y,
-                  .w = size,
-                  .h = size,
-  };
+    if (asteroid->destroyed == true) return;
+    uint size = asteroid->radius*2;
+    uint k = 5;
+    uint x = (asteroid->tick/k)*size;
+    SDL_Rect src = {
+                    .x = x,
+                    .y = 0,
+                    .w = size,
+                    .h = size,
+    };
 
-  if (keyframe) {
-    asteroid->tick = asteroid->tick/k < asteroid->frames ? asteroid->tick + 1 : 0;
+    SDL_Rect dest = {
+                    .x = asteroid->pos.x,
+                    .y = asteroid->pos.y,
+                    .w = size,
+                    .h = size,
+    };
+
+    if (keyframe) {
+        asteroid->tick = asteroid->tick/k < asteroid->frames ? asteroid->tick + 1 : 0;
+    }
+
+    SDL_RenderCopy(ren, asteroid->texture, &src, &dest);
   }
-
-  SDL_RenderCopy(ren, asteroid->texture, &src, &dest);
 }
 
 bool projectile_colide_asteroids(Asteroids* asteroids, Vec vec)
@@ -137,7 +144,7 @@ bool projectile_colide_asteroids(Asteroids* asteroids, Vec vec)
   return res;
 }
 
-bool colide_with_c_asteroids(Asteroids* asteroids, Vec pos, uint r)
+bool circle_colide_with_asteroids(Asteroids* asteroids, Vec pos, uint r)
 {
   for (uint i = 0; i < asteroids->size; i++) {
     Asteroid* a = &asteroids->asteroids[i];

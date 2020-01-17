@@ -30,13 +30,13 @@ void destory_asteroids(Asteroids* asteroids)
   ;
 void create_asteroid(Asteroids* asteroids, Vec pos)
   ;
-void update_asteroid(Asteroid* asteroid, float speed, uint width, uint height)
+void update_asteroids(Asteroids* asteroids, float speed, uint width, uint height)
   ;
-void render_asteroid(Asteroid* asteroid, bool keyframe, SDL_Renderer* ren)
+void render_asteroids(Asteroids* asteroids, bool keyframe, SDL_Renderer* ren)
   ;
 bool projectile_colide_asteroids(Asteroids* asteroids, Vec vec)
   ;
-bool colide_with_c_asteroids(Asteroids* asteroids, Vec pos, uint r)
+bool circle_colide_with_asteroids(Asteroids* asteroids, Vec pos, uint r)
   ;
 
 #endif

@@ -28,12 +28,12 @@ LIBS=-lSDL2 -lSDL2_image -lm
 
 $(ODIR)/%.o: $(SOURCE)
 	@echo $(SOURCE)
-	$(CC) -c -o $@ $< $(CFLAGS) -I$(INCDIR) `sdl2-config --cflags --libs`
+	$(CC) -c -o $@ $< $(CFLAGS) -I$(INCDIR) `sdl2-config --cflags`
 
 # Compile Binary
 
 $(OUTDIR)/asteroids: $(ODIR)/%.o
-	$(CC) -I$(INCDIR) $(LIBS) `sdl2-config --cflags --libs` $(SOURCE) -o $@
+	$(CC) -I$(INCDIR) $(LIBS) `sdl2-config --libs` $(SOURCE) -o $@
 
 all: $(OUTDIRE)/asteroids
 

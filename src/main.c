@@ -122,17 +122,14 @@ int main()
 
     // UPDATE
     update_ship(&input, &ship, speed, win_width, win_height);
-
-    for (uint i = 0; i < asteroids->size; ++i) {
-      update_asteroid(&asteroids->asteroids[i], speed, win_width, win_height);
-    }
+    update_asteroids(asteroids, speed, win_width, win_height);
 
     projectiles = update_projectiles(projectiles, win_width, win_height, speed);
     projectiles = colide_asteroids(asteroids, projectiles, explosions);
 
     // Check player & asteroids collision
 
-    if (colide_with_c_asteroids(asteroids, ship.pos, 24)) {
+    if (circle_colide_with_asteroids(asteroids, ship.pos, 24)) {
       printf("Game over\n");
       create_explosion(explosions, ship.pos);
     }
@@ -142,12 +139,9 @@ int main()
     zxc_render_texture_fill(bg, ren);
 
     render_projectiles(projectiles, proj_texture, ren);
+    render_asteroids(asteroids, keyframe, ren);
     render_ship(&ship, ren);
     render_explosions(explosions, keyframe, ren);
-
-    for (uint i = 0; i < asteroids->size; ++i) {
-        render_asteroid(&asteroids->asteroids[i], keyframe, ren);
-    }
 
     SDL_RenderPresent(ren);
   }
