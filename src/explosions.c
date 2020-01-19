@@ -1,4 +1,4 @@
-#include "explosions.h"
+#include "entities.h"
 
 Explosions* init_explosions(SDL_Renderer* ren)
 {
@@ -32,30 +32,34 @@ void destroy_explosions(Explosions* explosions)
    and rest of the array is reorganized
    from start to end
  */
-void create_explosion(Explosions* explosions, Vec pos)
+void create_explosion(Explosions* explosions, ExplosionType type, Vec pos)
 {
-  // Configure based on texture
-  SDL_Texture* texture;
+  /* // Configure based on texture */
+  /* SDL_Texture* texture; */
   uint size, duration;
 
-  //TODO: add enum to pick explosion version
-  // small one
-  if (0) {
+  switch(type) {
+  case ExplosionSmall: {
     size = 50;
     duration = 30;
-    texture = explosions->texture_a;
-  } else if (2) {
+  } break;
+  case ExplosionBig: {
     size = 192;
     duration = 64;
-    texture = explosions->texture_b;
-  } else {
+  } break;
+  case ExplosionHuge: {
     size = 256;
     duration = 48;
-    texture = explosions->texture_c;
+  } break;
+  default: {
+    fprintf(stderr,
+            "Unknown ExplosionType: %d", type);
+    exit(-1);
+  }
   }
 
   uint loc = explosions->size;
-  Explosion explosion = {texture, 0, size, duration, pos, false};
+  Explosion explosion = {type, 0, size, duration, pos, false};
 
   // THIS MIGHT OVERWRITE SOME EXPLOSIONS DATA
   if (loc >= MAX_EXPLOSIONS) {
@@ -80,6 +84,26 @@ void create_explosion(Explosions* explosions, Vec pos)
   }
 }
 
+SDL_Texture* get_texture(Explosions* explosions, ExplosionType type)
+{
+  switch (type) {
+  case ExplosionSmall: {
+    return explosions->texture_a;
+  } break;
+  case ExplosionBig: {
+    return explosions->texture_b;
+  } break;
+  case ExplosionHuge: {
+    return explosions->texture_c;
+  } break;
+  default: {
+    fprintf(stderr,
+            "Unknown ExplosionType: %d", type);
+    exit(-1);
+  }
+  }
+}
+
 void render_explosions(Explosions* explosions, bool keyframe, SDL_Renderer* ren)
 {
   for (uint i = 0; i < explosions->size; ++i) {
@@ -96,7 +120,7 @@ void render_explosions(Explosions* explosions, bool keyframe, SDL_Renderer* ren)
                      .h = explosion->size
     };
 
-    SDL_RenderCopy(ren, explosion->texture, &src, &dest);
+    SDL_RenderCopy(ren, get_texture(explosions, explosion->type), &src, &dest);
 
     if (keyframe) {
       if (explosion->tick < explosion->duration) {

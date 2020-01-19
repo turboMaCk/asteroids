@@ -1,10 +1,8 @@
-#include "projectiles.h"
+#include "entities.h"
 
 #include <SDL2/SDL.h>
 #include <zxc.h>
 #include <stdbool.h>
-#include "asteroids.h"
-#include "explosions.h"
 
 Projectiles* create_projectile(Projectiles* projectiles, Vec pos, double angle)
 {
@@ -39,7 +37,7 @@ Projectiles* colide_asteroids(Asteroids* asteroids, Projectiles* projectiles, Ex
     } else {
       if (next == NULL && prev != NULL) prev->tail = NULL;
       free(projectiles);
-      create_explosion(explosions, position);
+      create_explosion(explosions, ExplosionBig, position);
     }
 
     projectiles = next;

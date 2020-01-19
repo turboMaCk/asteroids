@@ -7,9 +7,7 @@
 
 #include "input.h"
 #include "ship.h"
-#include "projectiles.h"
-#include "asteroids.h"
-#include "explosions.h"
+#include "entities.h"
 
 const int win_width = 1200;
 const int win_height = 800;
@@ -131,7 +129,7 @@ int main()
 
     if (circle_colide_with_asteroids(asteroids, ship.pos, 24)) {
       printf("Game over\n");
-      create_explosion(explosions, ship.pos);
+      create_explosion(explosions, ExplosionHuge, ship.pos);
     }
 
     // RENDER
