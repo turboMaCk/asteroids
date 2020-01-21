@@ -9,13 +9,15 @@
 #include "ship.h"
 #include "entities.h"
 
+#define WIN_WIDTH 1200;
+#define WIN_HEIGHT 800;
 
 // SHIP
 
 int main()
 {
-  int win_width = 1200;
-  int win_height = 800;
+  int win_width = WIN_WIDTH;
+  int win_height = WIN_HEIGHT;
 
   // seed random
   srand(time(NULL));
@@ -126,6 +128,15 @@ int main()
           case SDL_WINDOWEVENT_SIZE_CHANGED:  {
             win_width = event.window.data1;
             win_height = event.window.data2;
+            // we should use ints here!
+            float scale = win_width / WIN_WIDTH;
+
+            // scale can be at least 1
+            scale = scale < 1 ? 1 : scale;
+
+            if (SDL_RenderSetScale(ren, scale, scale)) {
+              zxc_log_sdl_err("SetScale");
+            }
           } break;
           };
         } break;
