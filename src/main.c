@@ -59,14 +59,14 @@ int main()
   Asteroids* asteroids = init_asteroids(ren);
 
   Vec pos = {200,200};
-  create_asteroid(asteroids, pos);
-  create_asteroid(asteroids, pos);
-  create_asteroid(asteroids, pos);
-  create_asteroid(asteroids, pos);
-  create_asteroid(asteroids, pos);
-  create_asteroid(asteroids, pos);
-  create_asteroid(asteroids, pos);
-  create_asteroid(asteroids, pos);
+  create_asteroid(asteroids, AsteroidLarge, pos);
+  create_asteroid(asteroids, AsteroidLarge, pos);
+  create_asteroid(asteroids, AsteroidLarge, pos);
+  create_asteroid(asteroids, AsteroidLarge, pos);
+  create_asteroid(asteroids, AsteroidSmall, pos);
+  create_asteroid(asteroids, AsteroidSmall, pos);
+  create_asteroid(asteroids, AsteroidSmall, pos);
+  create_asteroid(asteroids, AsteroidSmall, pos);
 
   SDL_Texture* proj_texture = zxc_load_texture("images/spaceship.png", ren);
   Projectiles* projectiles = NULL;

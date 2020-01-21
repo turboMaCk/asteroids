@@ -10,12 +10,17 @@
 
 #define MAX_ASTEROIDS 64
 
+typedef enum {
+              AsteroidSmall,
+              AsteroidLarge
+} AsteroidType;
+
 typedef struct {
-  SDL_Texture* texture;
+  bool destroyed;
+  AsteroidType type;
   uint radius;
   uint tick;
   uint frames;
-  bool destroyed;
   Vec pos;
   Vec vel;
 } Asteroid;
@@ -23,6 +28,7 @@ typedef struct {
 typedef struct {
   uint size;
   SDL_Texture* texture;
+  SDL_Texture* texture_small;
   Asteroid asteroids[MAX_ASTEROIDS];
 } Asteroids;
 
@@ -30,7 +36,7 @@ Asteroids* init_asteroids(SDL_Renderer* ren)
   ;
 void destory_asteroids(Asteroids* asteroids)
   ;
-void create_asteroid(Asteroids* asteroids, Vec pos)
+void create_asteroid(Asteroids* asteroids, AsteroidType type, Vec pos)
   ;
 void update_asteroids(Asteroids* asteroids, float speed, uint width, uint height)
   ;
@@ -41,18 +47,19 @@ void render_asteroids(Asteroids* asteroids, bool keyframe, SDL_Renderer* ren)
 
 #define MAX_EXPLOSIONS 32
 
-typedef enum { ExplosionSmall,
-               ExplosionBig,
-               ExplosionHuge,
+typedef enum {
+              ExplosionSmall,
+              ExplosionBig,
+              ExplosionHuge,
 } ExplosionType;
 
 typedef struct {
+  bool destroyed;
   ExplosionType type;
   uint tick;
   uint size;
   uint duration;
-  Vec position;
-  bool destroyed;
+  Vec pos;
 } Explosion;
 
 typedef struct {
