@@ -107,7 +107,7 @@ void render_explosions(Explosions* explosions, bool keyframe, SDL_Renderer* ren)
 {
   for (uint i = 0; i < explosions->size; ++i) {
     Explosion* explosion = &explosions->arr[i];
-    if (explosion->destroyed) return;
+    if (explosion->destroyed) continue;
 
     int x = explosion->tick * explosion->size;
     SDL_Rect src = {x, 0, explosion->size, explosion->size};
