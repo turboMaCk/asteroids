@@ -6,22 +6,18 @@ Explosions* init_explosions(SDL_Renderer* ren)
   res->size = 0;
 
   // textures;
-  SDL_Texture* tex_a = zxc_load_texture("images/explosions/type_A.png", ren);
-  SDL_Texture* tex_b = zxc_load_texture("images/explosions/type_B.png", ren);
-  SDL_Texture* tex_c = zxc_load_texture("images/explosions/type_C.png", ren);
-
-  res->texture_a = tex_a;
-  res->texture_b = tex_b;
-  res->texture_c = tex_c;
+  res->texture_small = zxc_load_texture("images/explosions/type_A.png", ren);
+  res->texture_big = zxc_load_texture("images/explosions/type_B.png", ren);
+  res->texture_huge = zxc_load_texture("images/explosions/type_C.png", ren);
 
   return res;
 }
 
 void destroy_explosions(Explosions* explosions)
 {
-  SDL_DestroyTexture(explosions->texture_a);
-  SDL_DestroyTexture(explosions->texture_b);
-  SDL_DestroyTexture(explosions->texture_c);
+  SDL_DestroyTexture(explosions->texture_small);
+  SDL_DestroyTexture(explosions->texture_big);
+  SDL_DestroyTexture(explosions->texture_huge);
 
   free(explosions);
 }
@@ -31,24 +27,24 @@ void destroy_explosions(Explosions* explosions)
    new explosion is assigned to first available slot
    and rest of the array is reorganized
    from start to end
- */
+*/
 void create_explosion(Explosions* explosions, ExplosionType type, Vec pos)
 {
   /* // Configure based on texture */
   /* SDL_Texture* texture; */
-  uint size, duration;
+  uint radius, duration;
 
   switch(type) {
   case ExplosionSmall: {
-    size = 50;
+    radius = 25;
     duration = 30;
   } break;
   case ExplosionBig: {
-    size = 192;
+    radius = 96;
     duration = 64;
   } break;
   case ExplosionHuge: {
-    size = 256;
+    radius = 128;
     duration = 48;
   } break;
   default: {
@@ -63,7 +59,7 @@ void create_explosion(Explosions* explosions, ExplosionType type, Vec pos)
                          .destroyed = false,
                          .type = type,
                          .tick = 0,
-                         .size = size,
+                         .radius = radius,
                          .duration = duration,
                          .pos = pos
   };
@@ -95,13 +91,13 @@ SDL_Texture* get_explosion_texture(Explosions* explosions, ExplosionType type)
 {
   switch (type) {
   case ExplosionSmall: {
-    return explosions->texture_a;
+    return explosions->texture_small;
   } break;
   case ExplosionBig: {
-    return explosions->texture_b;
+    return explosions->texture_big;
   } break;
   case ExplosionHuge: {
-    return explosions->texture_c;
+    return explosions->texture_huge;
   } break;
   default: {
     fprintf(stderr, "Unknown ExplosionType: %d", type);
@@ -114,29 +110,31 @@ void render_explosions(Explosions* explosions, bool keyframe, SDL_Renderer* ren)
 {
   for (uint i = 0; i < explosions->size; ++i) {
     Explosion* explosion = &explosions->arr[i];
-    if (explosion->destroyed) continue;
 
-    int x = explosion->tick * explosion->size;
-    SDL_Rect src = {x, 0, explosion->size, explosion->size};
+    if (!explosion->destroyed) {
+      uint d = explosion->radius * 2;
+      int x = explosion->tick * d;
+      SDL_Rect src = {x, 0, d, d};
 
-    SDL_Rect dest = {
-                     .x = explosion->pos.x - explosion->size/2,
-                     .y = explosion->pos.y - explosion->size/2,
-                     .w = explosion->size,
-                     .h = explosion->size
-    };
+      SDL_Rect dest = {
+                       .x = explosion->pos.x - explosion->radius,
+                       .y = explosion->pos.y - explosion->radius,
+                       .w = d,
+                       .h = d,
+      };
 
-    SDL_RenderCopy(ren, get_explosion_texture(explosions, explosion->type), &src, &dest);
+      SDL_RenderCopy(ren, get_explosion_texture(explosions, explosion->type), &src, &dest);
 
-    if (keyframe) {
-      if (explosion->tick < explosion->duration) {
-        explosion->tick += 1;
-      }
-      else if (explosion->duration == explosion->tick) {
-        explosion->destroyed=true;
-      }
-      else {
-        explosion->tick = 0;
+      if (keyframe) {
+        if (explosion->tick < explosion->duration) {
+          explosion->tick += 1;
+        }
+        else if (explosion->duration == explosion->tick) {
+          explosion->destroyed=true;
+        }
+        else {
+          explosion->tick = 0;
+        }
       }
     }
   }

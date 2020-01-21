@@ -20,6 +20,8 @@ Asteroids* init_asteroids(SDL_Renderer* ren)
 void destory_asteroids(Asteroids* asteroids)
 {
   SDL_DestroyTexture(asteroids->texture);
+  SDL_DestroyTexture(asteroids->texture_small);
+
   free(asteroids);
 }
 
@@ -31,22 +33,10 @@ void create_asteroid(Asteroids* asteroids, AsteroidType type, Vec pos)
   int vx = (rand()%10) + 1;
   int vy = (rand()%10) + 1;
   Vec vel = {vx,vy};
-  uint radius;
-
-  switch (type) {
-  case AsteroidLarge:
-    {
-      radius = 32;
-    } break;
-  case AsteroidSmall:
-    {
-      // TODO fix image
-      radius = 32;
-    } break;
-  }
+  // TODO: radius is same for small and big
+  uint radius = 32;
 
   uint loc = asteroids->size;
-  // TODO: hardcoded radius
   Asteroid asteroid = {
                        .destroyed = false,
                        .type = type,
@@ -90,22 +80,22 @@ void update_asteroids(Asteroids* asteroids, float speed, uint width, uint height
   for (uint i = 0; i < asteroids->size; ++i) {
     Asteroid* asteroid = &asteroids->asteroids[i];
     // skip if asteroid is destroyed
-    if (asteroid->destroyed) continue;
+    if (!asteroid->destroyed) {
+      asteroid->pos = vec_add(asteroid->pos, vec_scale(1/speed, asteroid->vel));
 
-    asteroid->pos = vec_add(asteroid->pos, vec_scale(1/speed, asteroid->vel));
+      int min_limit = (int)asteroid->radius*-2;
 
-    int min_limit = (int)asteroid->radius*-2;
+      if (asteroid->pos.y > height) {
+          asteroid->pos.y = min_limit;
+      } else if (asteroid->pos.y < min_limit) {
+          asteroid->pos.y = height;
+      }
 
-    if (asteroid->pos.y > height) {
-        asteroid->pos.y = min_limit;
-    } else if (asteroid->pos.y < min_limit) {
-        asteroid->pos.y = height;
-    }
-
-    if (asteroid->pos.x > width) {
-        asteroid->pos.x = min_limit;
-    } else if (asteroid->pos.x < min_limit) {
-        asteroid->pos.x = width;
+      if (asteroid->pos.x > width) {
+          asteroid->pos.x = min_limit;
+      } else if (asteroid->pos.x < min_limit) {
+          asteroid->pos.x = width;
+      }
     }
   }
 }
@@ -135,32 +125,32 @@ void render_asteroids(Asteroids* asteroids, bool keyframe, SDL_Renderer* ren)
   for (uint i = 0; i < asteroids->size; ++i) {
     Asteroid* asteroid = &asteroids->asteroids[i];
 
-    if (asteroid->destroyed == true) continue;
+    if (!asteroid->destroyed) {
+      uint size = asteroid->radius*2;
+      SDL_Rect src;
+      uint k = 5;
 
-    uint size = asteroid->radius*2;
-    SDL_Rect src;
-    uint k = 5;
+      uint x = (asteroid->tick/k)*size;
+      src = (SDL_Rect) {
+                      .x = x,
+                      .y = 0,
+                      .w = size,
+                      .h = size,
+      };
 
-    uint x = (asteroid->tick/k)*size;
-    src = (SDL_Rect) {
-                    .x = x,
-                    .y = 0,
-                    .w = size,
-                    .h = size,
-    };
+      SDL_Rect dest = {
+                      .x = asteroid->pos.x,
+                      .y = asteroid->pos.y,
+                      .w = size,
+                      .h = size,
+      };
 
-    SDL_Rect dest = {
-                    .x = asteroid->pos.x,
-                    .y = asteroid->pos.y,
-                    .w = size,
-                    .h = size,
-    };
+      if (keyframe) {
+          asteroid->tick = asteroid->tick/k < asteroid->frames ? asteroid->tick + 1 : 0;
+      }
 
-    if (keyframe) {
-        asteroid->tick = asteroid->tick/k < asteroid->frames ? asteroid->tick + 1 : 0;
+      SDL_RenderCopy(ren, get_asteroid_texture(asteroids, asteroid->type), &src, &dest);
     }
-
-    SDL_RenderCopy(ren, get_asteroid_texture(asteroids, asteroid->type), &src, &dest);
   }
 }
 
@@ -179,6 +169,21 @@ bool projectile_colide_asteroids(Asteroids* asteroids, Vec vec)
       if ((powf(apos.x - vec.x, 2) + powf(apos.y - vec.y, 2)) <= r*r ) {
         asteroid->destroyed = true;
         res = true;
+
+        // create new asteroids
+        if (asteroid->type == AsteroidLarge) {
+          int num = rand() % 3 + 1;
+
+          // Small pieces from large asteroid
+          while (num) {
+            create_asteroid(asteroids, AsteroidSmall, asteroid->pos);
+            num--;
+          }
+
+          // new large asteroid
+          // TODO: generate position
+          create_asteroid(asteroids, AsteroidLarge, asteroid->pos);
+        }
         break;
       }
     }
@@ -194,18 +199,17 @@ bool circle_colide_with_asteroids(Asteroids* asteroids, Vec pos, uint r)
 {
   Asteroid* asteroid = asteroids->asteroids;
   for (uint i = 0; i < asteroids->size; i++) {
-    if (asteroid->destroyed) continue;
+    if (!asteroid->destroyed) {
+      uint dx = asteroid->pos.x - pos.x;
+      uint dy = asteroid->pos.y - pos.y;
 
-    uint dx = asteroid->pos.x - pos.x;
-    uint dy = asteroid->pos.y - pos.y;
+      double distance = sqrt((double) (dx * dx + dy * dy));
 
-    double distance = sqrt((double) (dx * dx + dy * dy));
-
-    if (distance < r + asteroid->radius) {
-      asteroid->destroyed = true;
-      return true;
+      if (distance < r + asteroid->radius) {
+        asteroid->destroyed = true;
+        return true;
+      }
     }
-
     asteroid++;
   }
 
