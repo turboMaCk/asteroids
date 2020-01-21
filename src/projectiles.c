@@ -37,26 +37,26 @@ Projectiles* colide_asteroids(Asteroids* asteroids, Projectiles* projectiles, Ex
     } else {
       if (next == NULL && prev != NULL) prev->tail = NULL;
       free(projectiles);
-      ExplosionType t;
-      switch ((int) rand() % 3 + 1) {
+      ExplosionType eType;
+      switch (rand() % 3 + 1) {
       case 1: {
-        t = ExplosionBig;
+        eType = ExplosionBig;
         printf("big\n");
       } break;
       case 2: {
-        t = ExplosionHuge;
+        eType = ExplosionHuge;
         printf("huge\n");
       } break;
       case 3: {
-        t = ExplosionSmall;
+        eType = ExplosionSmall;
         printf("small\n");
       } break;
       default: {
-        t = ExplosionBig;
+        eType = ExplosionBig;
         printf("default case reached\n");
       }
       }
-      create_explosion(explosions, ExplosionBig, position);
+      create_explosion(explosions, eType, position);
     }
 
     projectiles = next;
@@ -123,5 +123,14 @@ void render_projectiles(Projectiles* projectiles, SDL_Texture* texture, SDL_Rend
     SDL_RenderCopyEx(ren, texture, &src, &dest, projectile.rotation, NULL, SDL_FLIP_NONE);
 
     projectiles = (Projectiles*) projectiles->tail;
+  }
+}
+
+void destroy_projectiles(Projectiles* projectiles)
+{
+  while (projectiles) {
+    Projectiles* next = (Projectiles *) projectiles->tail;
+    free(projectiles);
+    projectiles = next;
   }
 }

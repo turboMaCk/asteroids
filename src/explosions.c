@@ -59,7 +59,14 @@ void create_explosion(Explosions* explosions, ExplosionType type, Vec pos)
   }
 
   uint loc = explosions->size;
-  Explosion explosion = {type, 0, size, duration, pos, false};
+  Explosion explosion = {
+                         .destroyed = false,
+                         .type = type,
+                         .tick = 0,
+                         .size = size,
+                         .duration = duration,
+                         .pos = pos
+  };
 
   // THIS MIGHT OVERWRITE SOME EXPLOSIONS DATA
   if (loc >= MAX_EXPLOSIONS) {
@@ -84,7 +91,7 @@ void create_explosion(Explosions* explosions, ExplosionType type, Vec pos)
   }
 }
 
-SDL_Texture* get_texture(Explosions* explosions, ExplosionType type)
+SDL_Texture* get_explosion_texture(Explosions* explosions, ExplosionType type)
 {
   switch (type) {
   case ExplosionSmall: {
@@ -113,13 +120,13 @@ void render_explosions(Explosions* explosions, bool keyframe, SDL_Renderer* ren)
     SDL_Rect src = {x, 0, explosion->size, explosion->size};
 
     SDL_Rect dest = {
-                     .x = explosion->position.x - explosion->size/2,
-                     .y = explosion->position.y - explosion->size/2,
+                     .x = explosion->pos.x - explosion->size/2,
+                     .y = explosion->pos.y - explosion->size/2,
                      .w = explosion->size,
                      .h = explosion->size
     };
 
-    SDL_RenderCopy(ren, get_texture(explosions, explosion->type), &src, &dest);
+    SDL_RenderCopy(ren, get_explosion_texture(explosions, explosion->type), &src, &dest);
 
     if (keyframe) {
       if (explosion->tick < explosion->duration) {

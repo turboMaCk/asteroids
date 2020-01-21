@@ -59,16 +59,15 @@ int main()
   Asteroids* asteroids = init_asteroids(ren);
 
   Vec pos = {200,200};
-  create_asteroid(asteroids, pos);
-  create_asteroid(asteroids, pos);
-  create_asteroid(asteroids, pos);
-  create_asteroid(asteroids, pos);
-  create_asteroid(asteroids, pos);
-  create_asteroid(asteroids, pos);
-  create_asteroid(asteroids, pos);
-  create_asteroid(asteroids, pos);
+  create_asteroid(asteroids, AsteroidLarge, pos);
+  create_asteroid(asteroids, AsteroidLarge, pos);
+  create_asteroid(asteroids, AsteroidLarge, pos);
+  create_asteroid(asteroids, AsteroidLarge, pos);
+  create_asteroid(asteroids, AsteroidSmall, pos);
+  create_asteroid(asteroids, AsteroidSmall, pos);
+  create_asteroid(asteroids, AsteroidSmall, pos);
+  create_asteroid(asteroids, AsteroidSmall, pos);
 
-  // TODO: refactor
   SDL_Texture* proj_texture = zxc_load_texture("images/spaceship.png", ren);
   Projectiles* projectiles = NULL;
 
@@ -150,6 +149,22 @@ int main()
 
     SDL_RenderPresent(ren);
   }
+
+  // Cleanup
+
+  // textures
+  SDL_DestroyTexture(proj_texture);
+  SDL_DestroyTexture(bg);
+
+  // game
+  destroy_ship(&ship);
+  destroy_explosions(explosions);
+  destory_asteroids(asteroids);
+  destroy_projectiles(projectiles);
+
+  // SDL stuff
+  SDL_DestroyRenderer(ren);
+  SDL_DestroyWindow(win);
 
   return 0;
 }

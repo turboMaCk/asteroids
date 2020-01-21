@@ -8,9 +8,11 @@
 Asteroids* init_asteroids(SDL_Renderer* ren)
 {
   SDL_Texture* texture = zxc_load_texture("images/rock.png", ren);
+  SDL_Texture* texture_small = zxc_load_texture("images/rock_small.png", ren);
   Asteroids* asteroids = malloc(sizeof(Asteroids));
   asteroids->size = 0;
   asteroids->texture = texture;
+  asteroids->texture_small = texture_small;
 
   return asteroids;
 }
@@ -24,15 +26,36 @@ void destory_asteroids(Asteroids* asteroids)
 /* NEW Asteroids migght not be created
    if there is no empty slot for it
 */
-void create_asteroid(Asteroids* asteroids, Vec pos)
+void create_asteroid(Asteroids* asteroids, AsteroidType type, Vec pos)
 {
   int vx = (rand()%10) + 1;
   int vy = (rand()%10) + 1;
   Vec vel = {vx,vy};
+  uint radius;
+
+  switch (type) {
+  case AsteroidLarge:
+    {
+      radius = 32;
+    } break;
+  case AsteroidSmall:
+    {
+      // TODO fix image
+      radius = 32;
+    } break;
+  }
 
   uint loc = asteroids->size;
   // TODO: hardcoded radius
-  Asteroid asteroid = {asteroids->texture, 32, 0, 16, false, pos, vel};
+  Asteroid asteroid = {
+                       .destroyed = false,
+                       .type = type,
+                       .radius = radius,
+                       .tick = 0,
+                       .frames = 16,
+                       .pos = pos,
+                       .vel = vel
+  };
 
   // THIS MIGHT OVERWRITE SOME EXPLOSIONS DATA
   if (asteroids->size >= MAX_ASTEROIDS) {
@@ -87,16 +110,39 @@ void update_asteroids(Asteroids* asteroids, float speed, uint width, uint height
   }
 }
 
+
+SDL_Texture* get_asteroid_texture(Asteroids* asteroids, AsteroidType type)
+{
+  SDL_Texture *texture;
+
+  switch (type) {
+  case AsteroidLarge: {
+    texture = asteroids->texture;
+  } break;
+  case AsteroidSmall: {
+    texture = asteroids->texture_small;
+  } break;
+  default:
+    fprintf(stderr, "Unknown steroid type %d", type);
+    exit(-1);
+  }
+
+  return texture;
+}
+
 void render_asteroids(Asteroids* asteroids, bool keyframe, SDL_Renderer* ren)
 {
   for (uint i = 0; i < asteroids->size; ++i) {
     Asteroid* asteroid = &asteroids->asteroids[i];
 
     if (asteroid->destroyed == true) continue;
+
     uint size = asteroid->radius*2;
+    SDL_Rect src;
     uint k = 5;
+
     uint x = (asteroid->tick/k)*size;
-    SDL_Rect src = {
+    src = (SDL_Rect) {
                     .x = x,
                     .y = 0,
                     .w = size,
@@ -114,7 +160,7 @@ void render_asteroids(Asteroids* asteroids, bool keyframe, SDL_Renderer* ren)
         asteroid->tick = asteroid->tick/k < asteroid->frames ? asteroid->tick + 1 : 0;
     }
 
-    SDL_RenderCopy(ren, asteroid->texture, &src, &dest);
+    SDL_RenderCopy(ren, get_asteroid_texture(asteroids, asteroid->type), &src, &dest);
   }
 }
 
