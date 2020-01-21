@@ -60,6 +60,13 @@ int main()
 
   Vec pos = {200,200};
   create_asteroid(asteroids, pos);
+  create_asteroid(asteroids, pos);
+  create_asteroid(asteroids, pos);
+  create_asteroid(asteroids, pos);
+  create_asteroid(asteroids, pos);
+  create_asteroid(asteroids, pos);
+  create_asteroid(asteroids, pos);
+  create_asteroid(asteroids, pos);
 
   // TODO: refactor
   SDL_Texture* proj_texture = zxc_load_texture("images/spaceship.png", ren);
