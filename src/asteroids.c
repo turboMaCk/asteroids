@@ -179,6 +179,21 @@ bool projectile_colide_asteroids(Asteroids* asteroids, Vec vec)
       if ((powf(apos.x - vec.x, 2) + powf(apos.y - vec.y, 2)) <= r*r ) {
         asteroid->destroyed = true;
         res = true;
+
+        // create new asteroids
+        if (asteroid->type == AsteroidLarge) {
+          int num = rand() % 3 + 1;
+
+          // Small pieces from large asteroid
+          while (num) {
+            create_asteroid(asteroids, AsteroidSmall, asteroid->pos);
+            num--;
+          }
+
+          // new large asteroid
+          // TODO: generate position
+          create_asteroid(asteroids, AsteroidLarge, asteroid->pos);
+        }
         break;
       }
     }

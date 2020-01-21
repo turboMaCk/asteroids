@@ -9,13 +9,14 @@
 #include "ship.h"
 #include "entities.h"
 
-const int win_width = 1200;
-const int win_height = 800;
 
 // SHIP
 
 int main()
 {
+  int win_width = 1200;
+  int win_height = 800;
+
   // seed random
   srand(time(NULL));
 
@@ -31,7 +32,7 @@ int main()
                          SDL_WINDOWPOS_CENTERED,
                          win_width,
                          win_height,
-                         SDL_WINDOW_SHOWN);
+                         SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
 
   if (!win) {
     zxc_log_sdl_err("CreateWindow");
@@ -120,6 +121,14 @@ int main()
           projectiles = create_projectile(projectiles, ship.pos, ship.rotation);
           } break;
         }
+        case SDL_WINDOWEVENT: {
+          switch (event.window.event) {
+          case SDL_WINDOWEVENT_SIZE_CHANGED:  {
+            win_width = event.window.data1;
+            win_height = event.window.data2;
+          } break;
+          };
+        } break;
       } break;
       } break;
     }
@@ -165,6 +174,7 @@ int main()
   // SDL stuff
   SDL_DestroyRenderer(ren);
   SDL_DestroyWindow(win);
+  SDL_Quit();
 
   return 0;
 }
