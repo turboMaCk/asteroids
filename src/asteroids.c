@@ -67,7 +67,7 @@ void update_asteroids(Asteroids* asteroids, float speed, uint width, uint height
   for (uint i = 0; i < asteroids->size; ++i) {
     Asteroid* asteroid = &asteroids->asteroids[i];
     // skip if asteroid is destroyed
-    if (asteroid->destroyed) return;
+    if (asteroid->destroyed) continue;
 
     asteroid->pos = vec_add(asteroid->pos, vec_scale(1/speed, asteroid->vel));
 
@@ -92,7 +92,7 @@ void render_asteroids(Asteroids* asteroids, bool keyframe, SDL_Renderer* ren)
   for (uint i = 0; i < asteroids->size; ++i) {
     Asteroid* asteroid = &asteroids->asteroids[i];
 
-    if (asteroid->destroyed == true) return;
+    if (asteroid->destroyed == true) continue;
     uint size = asteroid->radius*2;
     uint k = 5;
     uint x = (asteroid->tick/k)*size;
@@ -120,7 +120,7 @@ void render_asteroids(Asteroids* asteroids, bool keyframe, SDL_Renderer* ren)
 
 bool projectile_colide_asteroids(Asteroids* asteroids, Vec vec)
 {
-  Asteroid *asteroid = asteroids->asteroids;
+  Asteroid* asteroid = asteroids->asteroids;
   bool res = false;
 
   for (uint i = 0; i < asteroids->size; i++) {
@@ -146,19 +146,21 @@ bool projectile_colide_asteroids(Asteroids* asteroids, Vec vec)
 
 bool circle_colide_with_asteroids(Asteroids* asteroids, Vec pos, uint r)
 {
+  Asteroid* asteroid = asteroids->asteroids;
   for (uint i = 0; i < asteroids->size; i++) {
-    Asteroid* a = &asteroids->asteroids[i];
-    if (a->destroyed) continue;
+    if (asteroid->destroyed) continue;
 
-    uint dx = a->pos.x - pos.x;
-    uint dy = a->pos.y - pos.y;
+    uint dx = asteroid->pos.x - pos.x;
+    uint dy = asteroid->pos.y - pos.y;
 
     double distance = sqrt((double) (dx * dx + dy * dy));
 
-    if (distance < r + a->radius) {
-      a->destroyed = true;
+    if (distance < r + asteroid->radius) {
+      asteroid->destroyed = true;
       return true;
     }
+
+    asteroid++;
   }
 
   return false;

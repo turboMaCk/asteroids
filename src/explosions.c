@@ -97,8 +97,7 @@ SDL_Texture* get_texture(Explosions* explosions, ExplosionType type)
     return explosions->texture_c;
   } break;
   default: {
-    fprintf(stderr,
-            "Unknown ExplosionType: %d", type);
+    fprintf(stderr, "Unknown ExplosionType: %d", type);
     exit(-1);
   }
   }
