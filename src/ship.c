@@ -72,3 +72,8 @@ void render_ship(Ship* ship, SDL_Renderer* ren)
     };
     SDL_RenderCopyEx(ren, ship->texture, &src, &dest, ship->rotation, NULL, SDL_FLIP_NONE);
 }
+
+void destroy_ship(Ship* ship)
+{
+  SDL_DestroyTexture(ship->texture);
+}

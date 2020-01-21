@@ -92,6 +92,8 @@ Projectiles* update_projectiles(Projectiles* projectiles, uint win_width, uint w
   ;
 void render_projectiles(Projectiles* projectiles, SDL_Texture* texture, SDL_Renderer* ren)
   ;
+void destroy_projectiles(Projectiles* projectiles)
+  ;
 
 // Colisions
 

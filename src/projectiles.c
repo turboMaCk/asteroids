@@ -125,3 +125,12 @@ void render_projectiles(Projectiles* projectiles, SDL_Texture* texture, SDL_Rend
     projectiles = (Projectiles*) projectiles->tail;
   }
 }
+
+void destroy_projectiles(Projectiles* projectiles)
+{
+  while (projectiles) {
+    Projectiles* next = (Projectiles *) projectiles->tail;
+    free(projectiles);
+    projectiles = next;
+  }
+}

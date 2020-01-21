@@ -18,11 +18,11 @@ typedef struct {
 
 Ship init_ship(Vec pos, SDL_Renderer* ren)
   ;
-
 void update_ship(Input* input, Ship* ship, float speed, uint win_width, uint win_height)
   ;
-
 void render_ship(Ship* ship, SDL_Renderer* ren)
+  ;
+void destroy_ship(Ship* ship)
   ;
 
 #endif // _SHIP_H_
