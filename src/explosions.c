@@ -31,7 +31,7 @@ void destroy_explosions(Explosions* explosions)
    new explosion is assigned to first available slot
    and rest of the array is reorganized
    from start to end
- */
+*/
 void create_explosion(Explosions* explosions, ExplosionType type, Vec pos)
 {
   /* // Configure based on texture */
@@ -114,29 +114,30 @@ void render_explosions(Explosions* explosions, bool keyframe, SDL_Renderer* ren)
 {
   for (uint i = 0; i < explosions->size; ++i) {
     Explosion* explosion = &explosions->arr[i];
-    if (explosion->destroyed) continue;
 
-    int x = explosion->tick * explosion->size;
-    SDL_Rect src = {x, 0, explosion->size, explosion->size};
+    if (!explosion->destroyed) {
+      int x = explosion->tick * explosion->size;
+      SDL_Rect src = {x, 0, explosion->size, explosion->size};
 
-    SDL_Rect dest = {
-                     .x = explosion->pos.x - explosion->size/2,
-                     .y = explosion->pos.y - explosion->size/2,
-                     .w = explosion->size,
-                     .h = explosion->size
-    };
+      SDL_Rect dest = {
+                       .x = explosion->pos.x - explosion->size/2,
+                       .y = explosion->pos.y - explosion->size/2,
+                       .w = explosion->size,
+                       .h = explosion->size
+      };
 
-    SDL_RenderCopy(ren, get_explosion_texture(explosions, explosion->type), &src, &dest);
+      SDL_RenderCopy(ren, get_explosion_texture(explosions, explosion->type), &src, &dest);
 
-    if (keyframe) {
-      if (explosion->tick < explosion->duration) {
-        explosion->tick += 1;
-      }
-      else if (explosion->duration == explosion->tick) {
-        explosion->destroyed=true;
-      }
-      else {
-        explosion->tick = 0;
+      if (keyframe) {
+        if (explosion->tick < explosion->duration) {
+          explosion->tick += 1;
+        }
+        else if (explosion->duration == explosion->tick) {
+          explosion->destroyed=true;
+        }
+        else {
+          explosion->tick = 0;
+        }
       }
     }
   }

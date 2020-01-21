@@ -129,10 +129,12 @@ int main()
             win_width = event.window.data1;
             win_height = event.window.data2;
             // we should use ints here!
-            float scale = win_width / WIN_WIDTH;
+            int scale = win_width / WIN_WIDTH;
 
             // scale can be at least 1
             scale = scale < 1 ? 1 : scale;
+            win_height /= scale;
+            win_width /= scale;
 
             if (SDL_RenderSetScale(ren, scale, scale)) {
               zxc_log_sdl_err("SetScale");
