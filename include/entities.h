@@ -26,9 +26,9 @@ typedef struct {
 } Asteroid;
 
 typedef struct {
-  uint size;
   SDL_Texture* texture;
   SDL_Texture* texture_small;
+  uint size;
   Asteroid asteroids[MAX_ASTEROIDS];
 } Asteroids;
 
@@ -57,16 +57,16 @@ typedef struct {
   bool destroyed;
   ExplosionType type;
   uint tick;
-  uint size;
+  uint radius;
   uint duration;
   Vec pos;
 } Explosion;
 
 typedef struct {
   uint size;
-  SDL_Texture* texture_a;
-  SDL_Texture* texture_b;
-  SDL_Texture* texture_c;
+  SDL_Texture* texture_small;
+  SDL_Texture* texture_big;
+  SDL_Texture* texture_huge;
   Explosion arr[MAX_EXPLOSIONS];
 } Explosions;
 

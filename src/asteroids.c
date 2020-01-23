@@ -20,6 +20,8 @@ Asteroids* init_asteroids(SDL_Renderer* ren)
 void destory_asteroids(Asteroids* asteroids)
 {
   SDL_DestroyTexture(asteroids->texture);
+  SDL_DestroyTexture(asteroids->texture_small);
+
   free(asteroids);
 }
 
