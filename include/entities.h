@@ -78,6 +78,8 @@ void create_explosion(Explosions* explosions, ExplosionType type, Vec pos)
   ;
 void render_explosions(Explosions* explosions, bool keyframe, SDL_Renderer* ren)
   ;
+ExplosionType generate_explosion_type()
+  ;
 
 // Projectiles
 

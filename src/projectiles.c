@@ -37,26 +37,7 @@ Projectiles* colide_asteroids(Asteroids* asteroids, Projectiles* projectiles, Ex
     } else {
       if (next == NULL && prev != NULL) prev->tail = NULL;
       free(projectiles);
-      ExplosionType eType;
-      switch (rand() % 3 + 1) {
-      case 1: {
-        eType = ExplosionBig;
-        printf("big\n");
-      } break;
-      case 2: {
-        eType = ExplosionHuge;
-        printf("huge\n");
-      } break;
-      case 3: {
-        eType = ExplosionSmall;
-        printf("small\n");
-      } break;
-      default: {
-        eType = ExplosionBig;
-        printf("default case reached\n");
-      }
-      }
-      create_explosion(explosions, eType, position);
+      create_explosion(explosions, generate_explosion_type(), position);
     }
 
     projectiles = next;
