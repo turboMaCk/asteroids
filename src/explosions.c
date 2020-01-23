@@ -87,6 +87,26 @@ void create_explosion(Explosions* explosions, ExplosionType type, Vec pos)
   }
 }
 
+ExplosionType generate_explosion_type()
+{
+  ExplosionType explosion_type;
+  switch (rand() % 3 + 1) {
+  case 1: {
+    explosion_type = ExplosionBig;
+  } break;
+  case 2: {
+    explosion_type = ExplosionHuge;
+  } break;
+  case 3: {
+    explosion_type = ExplosionSmall;
+  } break;
+  default: {
+    explosion_type = ExplosionBig;
+  }
+  }
+  return explosion_type;
+}
+
 SDL_Texture* get_explosion_texture(Explosions* explosions, ExplosionType type)
 {
   switch (type) {

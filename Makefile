@@ -1,7 +1,7 @@
 # Compiler configuration
 
-CC= gcc
-CFLAGS= \
+CC = gcc
+CFLAGS = \
 	-Wall \
 	-pedantic \
 	-Werror \
@@ -12,30 +12,33 @@ CFLAGS= \
 
 # Directories
 
-ODIR= obj
-INCDIR= include
-SRCDIR= src
-OUTDIR= build
+ODIR = obj
+INCDIR = include
+SRCDIR = src
+OUTDIR = build
 
 # Helper variables
-SOURCE= $(wildcard $(SRCDIR)/*.c)
+
+SOURCE = $(wildcard $(SRCDIR)/*.c)
 
 # Libraries
 
-LIBS=-lSDL2 -lSDL2_image -lm
+LIBS = -lSDL2 -lSDL2_image -lm
+
+# Build
+
+all: $(OUTDIRE)/asteroids
 
 # Compile Objects
 
-$(ODIR)/%.o: $(SOURCE)
+$(ODIR)/main.o: $(SOURCE)
 	@echo $(SOURCE)
 	$(CC) -c -o $@ $< $(CFLAGS) -I$(INCDIR) `sdl2-config --cflags`
 
 # Compile Binary
 
-$(OUTDIR)/asteroids: $(ODIR)/%.o
+$(OUTDIR)/asteroids: $(ODIR)/main.o
 	$(CC) -I$(INCDIR) $(LIBS) `sdl2-config --libs` $(SOURCE) -o $@
-
-all: $(OUTDIRE)/asteroids
 
 # Compile and run
 
@@ -43,7 +46,7 @@ all: $(OUTDIRE)/asteroids
 run: $(OUTDIR)/asteroids
 	./$(OUTDIR)/asteroids
 
-# clean
+# Clean
 
 .PHONY: clean
 clean:
