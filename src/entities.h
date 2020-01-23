@@ -1,10 +1,10 @@
 #ifndef _ENTITIES_H_
 #define _ENTITIES_H_
 
-#include <SDL2/SDL.h>
 #include <stdbool.h>
-#include <zxc.h>
 #include <math.h>
+#include <SDL2/SDL.h>
+#include <vec.h>
 
 // ASTEROIDS
 
@@ -32,15 +32,17 @@ typedef struct {
   Asteroid asteroids[MAX_ASTEROIDS];
 } Asteroids;
 
-Asteroids* init_asteroids(SDL_Renderer* ren)
+Asteroids* Asteroids_init(SDL_Renderer* ren)
   ;
-void destory_asteroids(Asteroids* asteroids)
+void Asteroids_destroy(Asteroids* asteroids)
   ;
-void create_asteroid(Asteroids* asteroids, AsteroidType type, Vec pos)
+void Asteroids_create(Asteroids* asteroids, AsteroidType type, Vec pos)
   ;
-void update_asteroids(Asteroids* asteroids, float speed, uint width, uint height)
+void Asteroids_update(Asteroids* asteroids, float speed, uint width, uint height)
   ;
-void render_asteroids(Asteroids* asteroids, bool keyframe, SDL_Renderer* ren)
+void Asteroids_render(Asteroids* asteroids, bool keyframe, SDL_Renderer* ren)
+  ;
+void Asteroids_create_random(Asteroids* asteroids, uint win_width, uint win_height)
   ;
 
 // Explosions
@@ -70,15 +72,15 @@ typedef struct {
   Explosion arr[MAX_EXPLOSIONS];
 } Explosions;
 
-Explosions* init_explosions(SDL_Renderer* ren)
+Explosions* Explosions_init(SDL_Renderer* ren)
   ;
-void destroy_explosions(Explosions* explosions)
+void Explosions_destroy(Explosions* explosions)
   ;
-void create_explosion(Explosions* explosions, ExplosionType type, Vec pos)
+void Explosions_create(Explosions* explosions, ExplosionType type, Vec pos)
   ;
-void render_explosions(Explosions* explosions, bool keyframe, SDL_Renderer* ren)
+void Explosions_render(Explosions* explosions, bool keyframe, SDL_Renderer* ren)
   ;
-ExplosionType generate_explosion_type()
+ExplosionType Explosions_generate_type()
   ;
 
 // Projectiles
@@ -86,6 +88,7 @@ ExplosionType generate_explosion_type()
 typedef struct {
   int id;
   Vec pos;
+  Vec vel;
   double rotation;
 } Projectile;
 
@@ -95,21 +98,21 @@ typedef struct {
   struct Projectiles* before;
 } Projectiles;
 
-Projectiles* create_projectile(Projectiles* projectiles, Vec pos, double angle)
+Projectiles* Projectiles_create(Projectiles* projectiles, Vec pos, Vec vel, double angle)
   ;
-Projectiles* update_projectiles(Projectiles* projectiles, uint win_width, uint win_height, float speed)
+Projectiles* Projectiles_update(Projectiles* projectiles, uint win_width, uint win_height, float speed)
   ;
-void render_projectiles(Projectiles* projectiles, SDL_Texture* texture, SDL_Renderer* ren)
+void Projectiles_render(Projectiles* projectiles, SDL_Texture* texture, SDL_Renderer* ren)
   ;
-void destroy_projectiles(Projectiles* projectiles)
+void Projectiles_destroy(Projectiles* projectiles)
   ;
 
 // Colisions
 
-bool projectile_colide_asteroids(Asteroids* asteroids, Vec vec)
+bool projectile_colide_asteroids(Asteroids* asteroids, Vec vec, uint win_width, uint win_height)
   ;
 // TODO: better name
-Projectiles* colide_asteroids(Asteroids* asteroids, Projectiles* projectiles, Explosions* explosions)
+Projectiles* colide_asteroids(Asteroids* asteroids, Projectiles* projectiles, Explosions* explosions, uint win_width, uint win_height)
   ;
 bool circle_colide_with_asteroids(Asteroids* asteroids, Vec pos, uint r)
   ;
