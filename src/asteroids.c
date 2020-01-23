@@ -30,8 +30,8 @@ void destory_asteroids(Asteroids* asteroids)
 */
 void create_asteroid(Asteroids* asteroids, AsteroidType type, Vec pos)
 {
-  int vx = (rand()%10) + 1;
-  int vy = (rand()%10) + 1;
+  int vx = (rand()%20) - 9;
+  int vy = (rand()%20) - 9;
   Vec vel = {vx,vy};
   // TODO: radius is same for small and big
   uint radius = 32;
