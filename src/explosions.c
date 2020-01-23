@@ -30,8 +30,7 @@ void destroy_explosions(Explosions* explosions)
 */
 void create_explosion(Explosions* explosions, ExplosionType type, Vec pos)
 {
-  /* // Configure based on texture */
-  /* SDL_Texture* texture; */
+  // Configure based on texture
   uint radius, duration;
 
   switch(type) {
@@ -104,6 +103,7 @@ ExplosionType generate_explosion_type()
     explosion_type = ExplosionBig;
   }
   }
+
   return explosion_type;
 }
 
