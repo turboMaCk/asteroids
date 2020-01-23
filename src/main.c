@@ -2,7 +2,6 @@
 #include <SDL2/SDL.h>
 #include <stdbool.h>
 #include <math.h>
-#include <zxc.h>
 #include <time.h>
 
 #include "input.h"

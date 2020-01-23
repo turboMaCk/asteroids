@@ -5,6 +5,7 @@
 
 #include <SDL2/SDL.h>
 #include <zxc.h>
+#include <vec.h>
 
 #include "input.h"
 

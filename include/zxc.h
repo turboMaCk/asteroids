@@ -18,20 +18,6 @@ void zxc_render_texture(SDL_Texture* texture,
 void zxc_render_texture_fill(SDL_Texture* texture, SDL_Renderer* ren)
   ;
 
-// VEC stuff
-
-typedef struct {
-  double x;
-  double y;
-} Vec;
-
-Vec vec_add(Vec a, Vec b)
-  ;
-Vec vec_scale(float f, Vec vec)
-  ;
-Vec vec_limit(float f, Vec vec)
-  ;
-
 // Other
 
 float gdc(int a, int b)

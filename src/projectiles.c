@@ -2,6 +2,7 @@
 
 #include <SDL2/SDL.h>
 #include <zxc.h>
+#include <vec.h>
 #include <stdbool.h>
 
 Projectiles* create_projectile(Projectiles* projectiles, Vec pos, double angle)
@@ -31,7 +32,6 @@ Projectiles* colide_asteroids(Asteroids* asteroids, Projectiles* projectiles, Ex
     if (!projectile_colide_asteroids(asteroids, position)) {
       if (new_head == NULL) new_head = projectiles;
       if (prev != NULL) prev->tail = (struct Projectiles*) projectiles;
-
 
       prev = projectiles;
     } else {

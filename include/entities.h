@@ -2,6 +2,7 @@
 #define _ENTITIES_H_
 
 #include <SDL2/SDL.h>
+#include <vec.h>
 #include <stdbool.h>
 #include <zxc.h>
 #include <math.h>

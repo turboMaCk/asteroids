@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <zxc.h>
 #include <math.h>
+#include <vec.h>
 
 Asteroids* init_asteroids(SDL_Renderer* ren)
 {

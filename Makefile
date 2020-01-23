@@ -27,7 +27,7 @@ LIBS = -lSDL2 -lSDL2_image -lm
 
 # Build
 
-all: $(OUTDIRE)/asteroids
+all: $(OUTDIR)/asteroids
 
 # Compile Objects
 
