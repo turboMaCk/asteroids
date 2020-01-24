@@ -56,7 +56,7 @@ void run_loop(Game* game, FpsCounter* fps, SDL_Window* win, SDL_Renderer* ren)
             win_width /= scale;
 
             if (SDL_RenderSetScale(ren, scale, scale)) {
-              zxc_log_sdl_err("SetScale");
+              SDL_Log("SetScale Error %s", SDL_GetError());
             }
           } break;
           };
@@ -91,7 +91,7 @@ int main()
                          SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
 
   if (!win) {
-    zxc_log_sdl_err("CreateWindow");
+    SDL_Log("CreateWindow Error: %s", SDL_GetError());
     SDL_Quit();
     return 1;
   }
@@ -103,7 +103,7 @@ int main()
   ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED);
 
   if (!ren) {
-    zxc_log_sdl_err("CreateRenderer");
+    SDL_Log("Create Renderer error: %s", SDL_GetError());
     SDL_DestroyWindow(win);
     SDL_Quit();
     return 1;

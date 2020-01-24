@@ -1,8 +1,8 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <SDL2/SDL.h>
+#include <SDL_image.h>
 
-#include <zxc.h>
 #include "ship.h"
 #include "entities.h"
 #include "input.h"
@@ -65,7 +65,7 @@ Game* Game_init(SDL_Renderer* ren)
   game->explosions = init_explosions(ren);
   game->asteroids = init_asteroids(ren);
   game->projectiles = NULL;
-  game->projectile_texture = zxc_load_texture("images/spaceship.png", ren);
+  game->projectile_texture = IMG_LoadTexture(ren, "images/spaceship.png");
 
   return game;
 }

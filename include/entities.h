@@ -1,11 +1,10 @@
 #ifndef _ENTITIES_H_
 #define _ENTITIES_H_
 
+#include <stdbool.h>
+#include <math.h>
 #include <SDL2/SDL.h>
 #include <vec.h>
-#include <stdbool.h>
-#include <zxc.h>
-#include <math.h>
 
 // ASTEROIDS
 

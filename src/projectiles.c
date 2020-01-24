@@ -1,7 +1,7 @@
 #include "entities.h"
 
 #include <SDL2/SDL.h>
-#include <zxc.h>
+#include <deg.h>
 #include <vec.h>
 #include <stdbool.h>
 
@@ -57,8 +57,8 @@ Projectiles* update_projectiles(Projectiles* projectiles, uint win_width, uint w
 
     // calculate new position
     Vec velocity = {
-                        .x = 15 * sin(projectile->rotation * toRad),
-                        .y = -15 * cos(projectile->rotation * toRad),
+                    .x = 15 * sin(deg_to_radians(projectile->rotation)),
+                    .y = -15 * cos(deg_to_radians(projectile->rotation)),
     };
 
     // Add initial velocity

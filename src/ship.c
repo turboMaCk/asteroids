@@ -1,13 +1,14 @@
 #include <SDL2/SDL.h>
-#include <zxc.h>
+#include <SDL_image.h>
 #include <vec.h>
+#include <deg.h>
 
 #include "input.h"
 #include "ship.h"
 
 Ship init_ship(Vec pos, SDL_Renderer* ren)
 {
-  SDL_Texture* texture = zxc_load_texture("images/spaceship.png", ren);
+  SDL_Texture* texture = IMG_LoadTexture(ren, "images/spaceship.png");
   double rotation = 0;
   double rotation_mom = 0;
   Vec vel = { 0,0 };
@@ -27,11 +28,12 @@ void update_ship(Input* input, Ship* ship, float speed, uint win_width, uint win
   }
   ship->rotation += ship->rotation_mom/speed;
 
+  float rad = deg_to_radians(ship->rotation);
   // VELOCITY
   if (fabs(input->thrust) > 0) {
     Vec thrust_vec = {
-                      .x = (input->thrust * sin(ship->rotation * toRad)) / speed,
-                      .y = (-1 * input->thrust * cos(ship->rotation * toRad)) / speed,
+                      .x = (input->thrust * sin(rad)) / speed,
+                      .y = (-1 * input->thrust * cos(rad)) / speed,
     };
 
     ship->vel = vec_limit(10, vec_add(ship->vel, thrust_vec));

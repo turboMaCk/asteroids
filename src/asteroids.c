@@ -1,15 +1,15 @@
 #include "entities.h"
 
 #include <SDL2/SDL.h>
+#include <SDL_image.h>
 #include <stdbool.h>
-#include <zxc.h>
 #include <math.h>
 #include <vec.h>
 
 Asteroids* init_asteroids(SDL_Renderer* ren)
 {
-  SDL_Texture* texture = zxc_load_texture("images/rock.png", ren);
-  SDL_Texture* texture_small = zxc_load_texture("images/rock_small.png", ren);
+  SDL_Texture* texture_small = IMG_LoadTexture(ren, "images/rock_small.png");
+  SDL_Texture* texture = IMG_LoadTexture(ren, "images/rock.png");
   Asteroids* asteroids = malloc(sizeof(Asteroids));
   asteroids->size = 0;
   asteroids->texture = texture;

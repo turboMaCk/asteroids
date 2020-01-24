@@ -1,4 +1,5 @@
 #include "entities.h"
+#include <SDL_image.h>
 
 Explosions* init_explosions(SDL_Renderer* ren)
 {
@@ -6,9 +7,9 @@ Explosions* init_explosions(SDL_Renderer* ren)
   res->size = 0;
 
   // textures;
-  res->texture_small = zxc_load_texture("images/explosions/type_A.png", ren);
-  res->texture_big = zxc_load_texture("images/explosions/type_B.png", ren);
-  res->texture_huge = zxc_load_texture("images/explosions/type_C.png", ren);
+  res->texture_small = IMG_LoadTexture(ren, "images/explosions/type_A.png");
+  res->texture_big = IMG_LoadTexture(ren, "images/explosions/type_B.png");
+  res->texture_huge = IMG_LoadTexture(ren, "images/explosions/type_C.png");
 
   return res;
 }
