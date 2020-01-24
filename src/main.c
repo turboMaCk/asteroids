@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <SDL2/SDL.h>
+
 #include <stdbool.h>
 #include <math.h>
 #include <time.h>
@@ -8,110 +9,37 @@
 #include "ship.h"
 #include "entities.h"
 
+#include "game.h"
+
 #define WIN_WIDTH 1200;
 #define WIN_HEIGHT 800;
 
-// SHIP
-
-int main()
+void run_loop(Game* game, FpsCounter* fps, SDL_Window* win, SDL_Renderer* ren)
 {
-  int win_width = WIN_WIDTH;
-  int win_height = WIN_HEIGHT;
-
-  // seed random
-  srand(time(NULL));
-
-  SDL_Window* win;
-  SDL_Renderer* ren;
-  bool running = true;
+  int win_width, win_height;
   Input input = { 0, 0 };
+  Game_start(game, win);
+  SDL_GetWindowSize(win, &win_width, &win_height);
 
-  SDL_Init(SDL_INIT_VIDEO);
-
-  win = SDL_CreateWindow("Asteroids",
-                         SDL_WINDOWPOS_CENTERED,
-                         SDL_WINDOWPOS_CENTERED,
-                         win_width,
-                         win_height,
-                         SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
-
-  if (!win) {
-    zxc_log_sdl_err("CreateWindow");
-    SDL_Quit();
-    return 1;
-  }
-
-  // Renderer
-  ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED);
-
-  if (!ren) {
-    zxc_log_sdl_err("CreateRenderer");
-    SDL_DestroyWindow(win);
-    SDL_Quit();
-    return 1;
-  }
-
-  // Background
-  SDL_Texture* bg = zxc_load_texture("images/background.jpg", ren);
-
-  // Entities
-  Vec ship_pos = { (win_width - SSIZE)/2, (win_height - SSIZE)/2 };
-  Ship ship = init_ship(ship_pos, ren);
-  Explosions* explosions = init_explosions(ren);
-  Asteroids* asteroids = init_asteroids(ren);
-
-  create_random_asteroid(asteroids, win_width, win_height);
-
-  SDL_Texture* proj_texture = zxc_load_texture("images/spaceship.png", ren);
-  Projectiles* projectiles = NULL;
-
-  // FPS meter
-  uint frame_count = 0;
-  uint last_time = SDL_GetTicks();
-  float speed = 3;
-  uint time;
-  bool keyframe = true;
-  uint fps_tick = 0;
-
-  while (running) {
-    frame_count++;
-    time = SDL_GetTicks();
-
-    if (last_time + 10 <= time) {
-      last_time = time;
-      speed = ((float) frame_count)/0.6;
-
-      fps_tick++;
-      // LOG FPS
-      if (fps_tick == 100) {
-        printf("FPS: %d\n", (frame_count * 60));
-        fps_tick = 0;
-      }
-
-      frame_count = 0;
-    }
-
-    // determine keyframes
-    if (frame_count % (int) speed == 0) {
-      keyframe = true;
-    } else {
-      keyframe = false;
-    }
-
-    SDL_Event event;
+  while (game->running) {
+    FPSC_update(fps);
 
     // HANDLE EVENTS
+    SDL_Event event;
     while (SDL_PollEvent(&event)) {
       switch (event.type) {
       case SDL_QUIT: {
-        running = false;
+        game->running = false;
       } break;
       case SDL_KEYUP:
       case SDL_KEYDOWN: {
         handle_keyboard(&event, &input);
         switch (event.key.keysym.sym) {
         case SDLK_SPACE: {
-          projectiles = create_projectile(projectiles, ship.pos, ship.vel, ship.rotation);
+          game->projectiles = create_projectile(game->projectiles,
+                                                game->ship.pos,
+                                                game->ship.vel,
+                                                game->ship.rotation);
           } break;
         }
         case SDL_WINDOWEVENT: {
@@ -137,43 +65,58 @@ int main()
       } break;
     }
 
-    // UPDATE
-    update_ship(&input, &ship, speed, win_width, win_height);
-    update_asteroids(asteroids, speed, win_width, win_height);
+    Game_update(game, fps, input, win_width, win_height);
+    Game_render(game, fps, ren);
+  }
+}
 
-    projectiles = update_projectiles(projectiles, win_width, win_height, speed);
-    projectiles = colide_asteroids(asteroids, projectiles, explosions, win_width, win_height);
+int main()
+{
+  int win_width = WIN_WIDTH;
+  int win_height = WIN_HEIGHT;
 
-    // Check player & asteroids collision
+  // seed random
+  srand(time(NULL));
 
-    if (circle_colide_with_asteroids(asteroids, ship.pos, 24)) {
-      printf("Game over\n");
-      create_explosion(explosions, ExplosionHuge, ship.pos);
-    }
+  SDL_Window* win;
+  SDL_Renderer* ren;
 
-    // RENDER
-    SDL_RenderClear(ren);
-    zxc_render_texture_fill(bg, ren);
+  SDL_Init(SDL_INIT_VIDEO);
 
-    render_projectiles(projectiles, proj_texture, ren);
-    render_asteroids(asteroids, keyframe, ren);
-    render_ship(&ship, ren);
-    render_explosions(explosions, keyframe, ren);
+  win = SDL_CreateWindow("Asteroids",
+                         SDL_WINDOWPOS_CENTERED,
+                         SDL_WINDOWPOS_CENTERED,
+                         win_width,
+                         win_height,
+                         SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
 
-    SDL_RenderPresent(ren);
+  if (!win) {
+    zxc_log_sdl_err("CreateWindow");
+    SDL_Quit();
+    return 1;
   }
 
+  // update window size
+  SDL_GetWindowSize(win, &win_width, &win_height);
+
+  // Renderer
+  ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED);
+
+  if (!ren) {
+    zxc_log_sdl_err("CreateRenderer");
+    SDL_DestroyWindow(win);
+    SDL_Quit();
+    return 1;
+  }
+
+  FpsCounter* fps = FPSC_init();
+  Game* game = Game_init(ren);
+
+  run_loop(game, fps, win, ren);
+
   // Cleanup
-
-  // textures
-  SDL_DestroyTexture(proj_texture);
-  SDL_DestroyTexture(bg);
-
-  // game
-  destroy_ship(&ship);
-  destroy_explosions(explosions);
-  destory_asteroids(asteroids);
-  destroy_projectiles(projectiles);
+  FPSC_destory(fps);
+  Game_destory(game);
 
   // SDL stuff
   SDL_DestroyRenderer(ren);
