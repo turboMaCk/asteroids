@@ -23,7 +23,7 @@ void update_ship(Input* input, Ship* ship, float speed, uint win_width, uint win
     ship->rotation_mom += fabs(ship->rotation_mom) < 5 ? input->rotation/speed : 0;
   } else {
     // slowing rotation
-    ship->rotation_mom += ship->rotation_mom > 0 ? -0.05/speed : 0.05/speed;
+    ship->rotation_mom += ship->rotation_mom > 0 ? -0.1/speed : 0.1/speed;
   }
   ship->rotation += ship->rotation_mom/speed;
 
@@ -34,7 +34,7 @@ void update_ship(Input* input, Ship* ship, float speed, uint win_width, uint win
                       .y = (-1 * input->thrust * cos(ship->rotation * toRad)) / speed,
     };
 
-    ship->vel = vec_limit(20, vec_add(ship->vel, thrust_vec));
+    ship->vel = vec_limit(10, vec_add(ship->vel, thrust_vec));
   } else {
     ship->vel = vec_scale(1 - (0.01 / speed), ship->vel);
   }

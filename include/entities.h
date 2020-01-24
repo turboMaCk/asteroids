@@ -89,6 +89,7 @@ ExplosionType generate_explosion_type()
 typedef struct {
   int id;
   Vec pos;
+  Vec vel;
   double rotation;
 } Projectile;
 
@@ -98,7 +99,7 @@ typedef struct {
   struct Projectiles* before;
 } Projectiles;
 
-Projectiles* create_projectile(Projectiles* projectiles, Vec pos, double angle)
+Projectiles* create_projectile(Projectiles* projectiles, Vec pos, Vec vel, double angle)
   ;
 Projectiles* update_projectiles(Projectiles* projectiles, uint win_width, uint win_height, float speed)
   ;

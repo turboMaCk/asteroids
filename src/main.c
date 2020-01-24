@@ -60,8 +60,7 @@ int main()
   Explosions* explosions = init_explosions(ren);
   Asteroids* asteroids = init_asteroids(ren);
 
-  Vec pos = {200,200};
-  create_asteroid(asteroids, AsteroidLarge, pos);
+  create_random_asteroid(asteroids, win_width, win_height);
 
   SDL_Texture* proj_texture = zxc_load_texture("images/spaceship.png", ren);
   Projectiles* projectiles = NULL;
@@ -112,7 +111,7 @@ int main()
         handle_keyboard(&event, &input);
         switch (event.key.keysym.sym) {
         case SDLK_SPACE: {
-          projectiles = create_projectile(projectiles, ship.pos, ship.rotation);
+          projectiles = create_projectile(projectiles, ship.pos, ship.vel, ship.rotation);
           } break;
         }
         case SDL_WINDOWEVENT: {

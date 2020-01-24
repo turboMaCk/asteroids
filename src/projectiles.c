@@ -5,10 +5,10 @@
 #include <vec.h>
 #include <stdbool.h>
 
-Projectiles* create_projectile(Projectiles* projectiles, Vec pos, double angle)
+Projectiles* create_projectile(Projectiles* projectiles, Vec pos, Vec vel, double angle)
 {
   int id = projectiles == NULL ? 1 : projectiles->head.id + 1;
-  Projectile proj = {id, pos, angle};
+  Projectile proj = {id, pos, vel, angle};
 
   Projectiles* new_projectiles = (Projectiles*) malloc(sizeof(Projectiles));
 
@@ -56,11 +56,15 @@ Projectiles* update_projectiles(Projectiles* projectiles, uint win_width, uint w
     Projectiles* next = (Projectiles*) projectiles->tail;
 
     // calculate new position
-    Vec thrust_vec = {
-                        .x = (20 * sin(projectile->rotation * toRad)) / speed,
-                        .y = (-20 * cos(projectile->rotation * toRad)) / speed,
+    Vec velocity = {
+                        .x = 15 * sin(projectile->rotation * toRad),
+                        .y = -15 * cos(projectile->rotation * toRad),
     };
-    projectile->pos = vec_add(projectile->pos, thrust_vec);
+
+    // Add initial velocity
+    velocity = vec_add(velocity, projectile->vel);
+    velocity = vec_scale(1/speed, velocity);
+    projectile->pos = vec_add(projectile->pos, velocity);
 
     // Check if projectile is on screen
     if (projectile->pos.x > -10 &&
