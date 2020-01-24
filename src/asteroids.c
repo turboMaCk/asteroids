@@ -76,6 +76,22 @@ void create_asteroid(Asteroids* asteroids, AsteroidType type, Vec pos)
   }
 }
 
+void create_random_asteroid(Asteroids* asteroids, uint win_width, uint win_height)
+{
+  int x = rand() % win_width + 1;
+  uint y = rand() % win_height + 1;
+
+  if (x / win_width <= y / win_height) {
+    x = 0;
+  } else {
+    y = 0;
+  }
+
+  Vec pos = {x,y};
+
+  create_asteroid(asteroids, AsteroidLarge, pos);
+}
+
 void update_asteroids(Asteroids* asteroids, float speed, uint width, uint height)
 {
   for (uint i = 0; i < asteroids->size; ++i) {
@@ -155,7 +171,7 @@ void render_asteroids(Asteroids* asteroids, bool keyframe, SDL_Renderer* ren)
   }
 }
 
-bool projectile_colide_asteroids(Asteroids* asteroids, Vec vec)
+bool projectile_colide_asteroids(Asteroids* asteroids, Vec vec, uint win_width, uint win_height)
 {
   Asteroid* asteroid = asteroids->asteroids;
   bool res = false;
@@ -182,8 +198,7 @@ bool projectile_colide_asteroids(Asteroids* asteroids, Vec vec)
           }
 
           // new large asteroid
-          // TODO: generate position
-          create_asteroid(asteroids, AsteroidLarge, asteroid->pos);
+          create_random_asteroid(asteroids, win_width, win_height);
         }
         break;
       }

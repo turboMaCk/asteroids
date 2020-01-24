@@ -43,6 +43,8 @@ void update_asteroids(Asteroids* asteroids, float speed, uint width, uint height
   ;
 void render_asteroids(Asteroids* asteroids, bool keyframe, SDL_Renderer* ren)
   ;
+void create_random_asteroid(Asteroids* asteroids, uint win_width, uint win_height)
+  ;
 
 // Explosions
 
@@ -107,10 +109,10 @@ void destroy_projectiles(Projectiles* projectiles)
 
 // Colisions
 
-bool projectile_colide_asteroids(Asteroids* asteroids, Vec vec)
+bool projectile_colide_asteroids(Asteroids* asteroids, Vec vec, uint win_width, uint win_height)
   ;
 // TODO: better name
-Projectiles* colide_asteroids(Asteroids* asteroids, Projectiles* projectiles, Explosions* explosions)
+Projectiles* colide_asteroids(Asteroids* asteroids, Projectiles* projectiles, Explosions* explosions, uint win_width, uint win_height)
   ;
 bool circle_colide_with_asteroids(Asteroids* asteroids, Vec pos, uint r)
   ;

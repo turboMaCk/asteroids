@@ -143,7 +143,7 @@ int main()
     update_asteroids(asteroids, speed, win_width, win_height);
 
     projectiles = update_projectiles(projectiles, win_width, win_height, speed);
-    projectiles = colide_asteroids(asteroids, projectiles, explosions);
+    projectiles = colide_asteroids(asteroids, projectiles, explosions, win_width, win_height);
 
     // Check player & asteroids collision
 

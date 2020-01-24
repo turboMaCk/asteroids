@@ -18,7 +18,7 @@ Projectiles* create_projectile(Projectiles* projectiles, Vec pos, double angle)
   return new_projectiles;
 }
 
-Projectiles* colide_asteroids(Asteroids* asteroids, Projectiles* projectiles, Explosions* explosions)
+Projectiles* colide_asteroids(Asteroids* asteroids, Projectiles* projectiles, Explosions* explosions, uint win_width, uint win_height)
 {
   Projectiles* new_head = NULL;
   Projectiles* prev = NULL;
@@ -29,7 +29,7 @@ Projectiles* colide_asteroids(Asteroids* asteroids, Projectiles* projectiles, Ex
     // Check if projectile is on screen
     Vec position = projectiles->head.pos;
 
-    if (!projectile_colide_asteroids(asteroids, position)) {
+    if (!projectile_colide_asteroids(asteroids, position, win_width, win_height)) {
       if (new_head == NULL) new_head = projectiles;
       if (prev != NULL) prev->tail = (struct Projectiles*) projectiles;
 
