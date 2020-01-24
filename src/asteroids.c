@@ -84,7 +84,7 @@ void update_asteroids(Asteroids* asteroids, float speed, uint width, uint height
     if (!asteroid->destroyed) {
       asteroid->pos = vec_add(asteroid->pos, vec_scale(1/speed, asteroid->vel));
 
-      int min_limit = (int)asteroid->radius*-2;
+      int min_limit = - (int) asteroid->radius;
 
       if (asteroid->pos.y > height) {
           asteroid->pos.y = min_limit;

@@ -43,15 +43,15 @@ void update_ship(Input* input, Ship* ship, float speed, uint win_width, uint win
   ship->pos.x += ship->vel.x/speed;
   ship->pos.y += ship->vel.y/speed;
 
-  if (ship->pos.x > win_width + SSIZE) {
+  if (ship->pos.x > win_width + SSIZE/2) {
     ship->pos.x = -SSIZE;
   } else if (ship->pos.x < -SSIZE) {
     ship->pos.x = win_width;
   }
 
-  if (ship->pos.y > win_height + SSIZE) {
-    ship->pos.y = -SSIZE;
-  } else if (ship->pos.y < -SSIZE) {
+  if (ship->pos.y > win_height + SSIZE/2) {
+    ship->pos.y = -SSIZE/2;
+  } else if (ship->pos.y < -SSIZE/2) {
     ship->pos.y = win_height;
   }
 }
