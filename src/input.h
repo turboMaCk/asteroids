@@ -7,6 +7,7 @@
 typedef struct {
   double rotation;
   float thrust;
+  uint count;
   bool fire;
 } Input;
 
