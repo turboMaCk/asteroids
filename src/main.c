@@ -55,7 +55,7 @@ void run_loop(Game* game, FpsCounter* fps, SDL_Window* win, SDL_Renderer* ren)
       }
     }
 
-    if (Input_is_firing(&input) && fps->keyframe) {
+    if (fps->keyframe && Input_is_firing(&input)) {
       game->projectiles = Projectiles_create(game->projectiles,
                                              game->ship.pos,
                                              game->ship.vel,

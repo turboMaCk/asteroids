@@ -4,12 +4,21 @@
 
 Input Input_init()
 {
-  Input input = {0,0,false};
+  Input input = {0,0,0,false};
   return input;
 }
 
 bool Input_is_firing(Input* input) {
-  return input->fire;
+  bool res;
+  if (input->fire && input->count >= 10) {
+    input->count = 0;
+    res = true;
+  } else {
+    input->count++;
+    res = false;
+  }
+
+  return res;
 }
 
 void Input_keyboard_handler(SDL_Event* event, Input* input)
@@ -36,6 +45,7 @@ void Input_keyboard_handler(SDL_Event* event, Input* input)
     } break;
     case SDLK_SPACE: {
       input->fire = false;
+      input->count = 0;
     }
     }
   }; break;
@@ -60,6 +70,7 @@ void Input_keyboard_handler(SDL_Event* event, Input* input)
     } break;
     case SDLK_SPACE: {
       input->fire = true;
+      input->count++;
     }
     }
   } break;
