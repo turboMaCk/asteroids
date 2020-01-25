@@ -61,7 +61,7 @@ Game* Game_init(SDL_Renderer* ren)
   Game* game = malloc(sizeof(Game));
 
   game->running = false;
-  game->ship = init_ship(ship_pos, ren);
+  game->ship = Ship_init(ship_pos, ren);
   game->explosions = Explosions_init(ren);
   game->asteroids = Asteroids_init(ren);
   game->projectiles = NULL;
@@ -91,7 +91,7 @@ void Game_update(Game* game,
                  int win_height)
 {
   // Ship
-  update_ship(&input, &game->ship, fps->speed, win_width, win_height);
+  Ship_update(&input, &game->ship, fps->speed, win_width, win_height);
   // Asteroids
   Asteroids_update(game->asteroids, fps->speed, win_width, win_height);
 
@@ -119,7 +119,7 @@ void Game_render(Game* game, FpsCounter* fps, SDL_Renderer* ren)
 
   Projectiles_render(game->projectiles, game->projectile_texture, ren);
   Asteroids_render(game->asteroids, fps->keyframe, ren);
-  render_ship(&game->ship, ren);
+  Ship_render(&game->ship, ren);
   Explosions_render(game->explosions, fps->keyframe, ren);
 
   SDL_RenderPresent(ren);
@@ -129,7 +129,7 @@ void Game_destory(Game *game)
 {
   SDL_DestroyTexture(game->projectile_texture);
 
-  destroy_ship(&game->ship);
+  Ship_destroy(&game->ship);
   Explosions_destroy(game->explosions);
   Asteroids_destroy(game->asteroids);
   Projectiles_destroy(game->projectiles);

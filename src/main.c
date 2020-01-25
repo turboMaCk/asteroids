@@ -17,7 +17,7 @@
 void run_loop(Game* game, FpsCounter* fps, SDL_Window* win, SDL_Renderer* ren)
 {
   int win_width, win_height;
-  Input input = { 0, 0 };
+  Input input = Input_init();
   Game_start(game, win);
   SDL_GetWindowSize(win, &win_width, &win_height);
 
@@ -27,43 +27,39 @@ void run_loop(Game* game, FpsCounter* fps, SDL_Window* win, SDL_Renderer* ren)
     // HANDLE EVENTS
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
+      // Handle game input
+      Input_keyboard_handler(&event, &input);
+
       switch (event.type) {
       case SDL_QUIT: {
         game->running = false;
       } break;
-      case SDL_KEYUP:
-      case SDL_KEYDOWN: {
-        handle_keyboard(&event, &input);
-        switch (event.key.keysym.sym) {
-        case SDLK_SPACE: {
-          // TODO: this should be done as part of Game
-          game->projectiles = Projectiles_create(game->projectiles,
-                                                game->ship.pos,
-                                                game->ship.vel,
-                                                game->ship.rotation);
-          } break;
+      case SDL_WINDOWEVENT: {
+        if (event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED) {
+          win_width = event.window.data1;
+          win_height = event.window.data2;
+          // we should use ints here!
+          int scale = win_width / WIN_WIDTH;
+
+          // scale can be at least 1
+          scale = scale < 1 ? 1 : scale;
+          win_height /= scale;
+          win_width /= scale;
+
+          // Error when scaling
+          if (SDL_RenderSetScale(ren, scale, scale)) {
+            SDL_Log("SetScale Error %s", SDL_GetError());
+          }
         }
-        case SDL_WINDOWEVENT: {
-          switch (event.window.event) {
-          case SDL_WINDOWEVENT_SIZE_CHANGED:  {
-            win_width = event.window.data1;
-            win_height = event.window.data2;
-            // we should use ints here!
-            int scale = win_width / WIN_WIDTH;
-
-            // scale can be at least 1
-            scale = scale < 1 ? 1 : scale;
-            win_height /= scale;
-            win_width /= scale;
-
-            if (SDL_RenderSetScale(ren, scale, scale)) {
-              SDL_Log("SetScale Error %s", SDL_GetError());
-            }
-          } break;
-          };
-        } break;
       } break;
-      } break;
+      }
+    }
+
+    if (Input_is_firing(&input) && fps->keyframe) {
+      game->projectiles = Projectiles_create(game->projectiles,
+                                             game->ship.pos,
+                                             game->ship.vel,
+                                             game->ship.rotation);
     }
 
     Game_update(game, fps, input, win_width, win_height);

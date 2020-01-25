@@ -6,7 +6,7 @@
 #include "input.h"
 #include "ship.h"
 
-Ship init_ship(Vec pos, SDL_Renderer* ren)
+Ship Ship_init(Vec pos, SDL_Renderer* ren)
 {
   SDL_Texture* texture = IMG_LoadTexture(ren, "images/spaceship.png");
   double rotation = 0;
@@ -17,7 +17,7 @@ Ship init_ship(Vec pos, SDL_Renderer* ren)
   return ship;
 }
 
-void update_ship(Input* input, Ship* ship, float speed, uint win_width, uint win_height)
+void Ship_update(Input* input, Ship* ship, float speed, uint win_width, uint win_height)
 {
   // ROTATION
   if (input->rotation != 0) {
@@ -58,7 +58,7 @@ void update_ship(Input* input, Ship* ship, float speed, uint win_width, uint win
   }
 }
 
-void render_ship(Ship* ship, SDL_Renderer* ren)
+void Ship_render(Ship* ship, SDL_Renderer* ren)
 {
     SDL_Rect src = {
                     .x = 38,
@@ -76,7 +76,7 @@ void render_ship(Ship* ship, SDL_Renderer* ren)
     SDL_RenderCopyEx(ren, ship->texture, &src, &dest, ship->rotation, NULL, SDL_FLIP_NONE);
 }
 
-void destroy_ship(Ship* ship)
+void Ship_destroy(Ship* ship)
 {
   SDL_DestroyTexture(ship->texture);
 }
