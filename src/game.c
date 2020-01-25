@@ -63,7 +63,7 @@ Game* Game_init(SDL_Renderer* ren)
   game->running = false;
   game->ship = init_ship(ship_pos, ren);
   game->explosions = init_explosions(ren);
-  game->asteroids = init_asteroids(ren);
+  game->asteroids = Asteroids_init(ren);
   game->projectiles = NULL;
   game->projectile_texture = IMG_LoadTexture(ren, "images/spaceship.png");
 
@@ -76,9 +76,9 @@ void Game_start(Game* game, SDL_Window* win)
   int win_height;
 
   SDL_GetWindowSize(win, &win_width, &win_height);
-  Vec ship_position = { win_width-SSIZE/2, win_height-SSIZE/2};
+  Vec ship_position = { win_width/2, win_height/2 };
 
-  create_random_asteroid(game->asteroids, win_width, win_height);
+  Asteroids_create_random(game->asteroids, win_width, win_height);
   game->ship.pos = ship_position;
   game->running = true;
 }
@@ -93,7 +93,7 @@ void Game_update(Game* game,
   // Ship
   update_ship(&input, &game->ship, fps->speed, win_width, win_height);
   // Asteroids
-  update_asteroids(game->asteroids, fps->speed, win_width, win_height);
+  Asteroids_update(game->asteroids, fps->speed, win_width, win_height);
 
   // Projectiles
   game->projectiles = update_projectiles(game->projectiles,
@@ -118,7 +118,7 @@ void Game_render(Game* game, FpsCounter* fps, SDL_Renderer* ren)
   SDL_RenderClear(ren);
 
   render_projectiles(game->projectiles, game->projectile_texture, ren);
-  render_asteroids(game->asteroids, fps->keyframe, ren);
+  Asteroids_render(game->asteroids, fps->keyframe, ren);
   render_ship(&game->ship, ren);
   render_explosions(game->explosions, fps->keyframe, ren);
 
@@ -131,6 +131,6 @@ void Game_destory(Game *game)
 
   destroy_ship(&game->ship);
   destroy_explosions(game->explosions);
-  destory_asteroids(game->asteroids);
+  Asteroids_destroy(game->asteroids);
   destroy_projectiles(game->projectiles);
 }

@@ -32,17 +32,17 @@ typedef struct {
   Asteroid asteroids[MAX_ASTEROIDS];
 } Asteroids;
 
-Asteroids* init_asteroids(SDL_Renderer* ren)
+Asteroids* Asteroids_init(SDL_Renderer* ren)
   ;
-void destory_asteroids(Asteroids* asteroids)
+void Asteroids_destroy(Asteroids* asteroids)
   ;
-void create_asteroid(Asteroids* asteroids, AsteroidType type, Vec pos)
+void Asteroids_create(Asteroids* asteroids, AsteroidType type, Vec pos)
   ;
-void update_asteroids(Asteroids* asteroids, float speed, uint width, uint height)
+void Asteroids_update(Asteroids* asteroids, float speed, uint width, uint height)
   ;
-void render_asteroids(Asteroids* asteroids, bool keyframe, SDL_Renderer* ren)
+void Asteroids_render(Asteroids* asteroids, bool keyframe, SDL_Renderer* ren)
   ;
-void create_random_asteroid(Asteroids* asteroids, uint win_width, uint win_height)
+void Asteroids_create_random(Asteroids* asteroids, uint win_width, uint win_height)
   ;
 
 // Explosions
