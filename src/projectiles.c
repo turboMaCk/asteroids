@@ -5,7 +5,7 @@
 #include <vec.h>
 #include <stdbool.h>
 
-Projectiles* create_projectile(Projectiles* projectiles, Vec pos, Vec vel, double angle)
+Projectiles* Projectiles_create(Projectiles* projectiles, Vec pos, Vec vel, double angle)
 {
   int id = projectiles == NULL ? 1 : projectiles->head.id + 1;
   Projectile proj = {id, pos, vel, angle};
@@ -46,7 +46,7 @@ Projectiles* colide_asteroids(Asteroids* asteroids, Projectiles* projectiles, Ex
   return new_head;
 }
 
-Projectiles* update_projectiles(Projectiles* projectiles, uint win_width, uint win_height, float speed)
+Projectiles* Projectiles_update(Projectiles* projectiles, uint win_width, uint win_height, float speed)
 {
   Projectiles* new_head = NULL;
   Projectiles* prev = NULL;
@@ -86,7 +86,7 @@ Projectiles* update_projectiles(Projectiles* projectiles, uint win_width, uint w
   return new_head;
 }
 
-void render_projectiles(Projectiles* projectiles, SDL_Texture* texture, SDL_Renderer* ren)
+void Projectiles_render(Projectiles* projectiles, SDL_Texture* texture, SDL_Renderer* ren)
 {
   while (projectiles != NULL) {
     Projectile projectile = projectiles->head;
@@ -111,7 +111,7 @@ void render_projectiles(Projectiles* projectiles, SDL_Texture* texture, SDL_Rend
   }
 }
 
-void destroy_projectiles(Projectiles* projectiles)
+void Projectiles_destroy(Projectiles* projectiles)
 {
   while (projectiles) {
     Projectiles* next = (Projectiles *) projectiles->tail;

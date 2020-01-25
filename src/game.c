@@ -96,7 +96,7 @@ void Game_update(Game* game,
   Asteroids_update(game->asteroids, fps->speed, win_width, win_height);
 
   // Projectiles
-  game->projectiles = update_projectiles(game->projectiles,
+  game->projectiles = Projectiles_update(game->projectiles,
                                          win_width,
                                          win_height,
                                          fps->speed);
@@ -117,7 +117,7 @@ void Game_render(Game* game, FpsCounter* fps, SDL_Renderer* ren)
 {
   SDL_RenderClear(ren);
 
-  render_projectiles(game->projectiles, game->projectile_texture, ren);
+  Projectiles_render(game->projectiles, game->projectile_texture, ren);
   Asteroids_render(game->asteroids, fps->keyframe, ren);
   render_ship(&game->ship, ren);
   Explosions_render(game->explosions, fps->keyframe, ren);
@@ -132,5 +132,5 @@ void Game_destory(Game *game)
   destroy_ship(&game->ship);
   Explosions_destroy(game->explosions);
   Asteroids_destroy(game->asteroids);
-  destroy_projectiles(game->projectiles);
+  Projectiles_destroy(game->projectiles);
 }

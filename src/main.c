@@ -36,7 +36,8 @@ void run_loop(Game* game, FpsCounter* fps, SDL_Window* win, SDL_Renderer* ren)
         handle_keyboard(&event, &input);
         switch (event.key.keysym.sym) {
         case SDLK_SPACE: {
-          game->projectiles = create_projectile(game->projectiles,
+          // TODO: this should be done as part of Game
+          game->projectiles = Projectiles_create(game->projectiles,
                                                 game->ship.pos,
                                                 game->ship.vel,
                                                 game->ship.rotation);

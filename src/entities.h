@@ -98,13 +98,13 @@ typedef struct {
   struct Projectiles* before;
 } Projectiles;
 
-Projectiles* create_projectile(Projectiles* projectiles, Vec pos, Vec vel, double angle)
+Projectiles* Projectiles_create(Projectiles* projectiles, Vec pos, Vec vel, double angle)
   ;
-Projectiles* update_projectiles(Projectiles* projectiles, uint win_width, uint win_height, float speed)
+Projectiles* Projectiles_update(Projectiles* projectiles, uint win_width, uint win_height, float speed)
   ;
-void render_projectiles(Projectiles* projectiles, SDL_Texture* texture, SDL_Renderer* ren)
+void Projectiles_render(Projectiles* projectiles, SDL_Texture* texture, SDL_Renderer* ren)
   ;
-void destroy_projectiles(Projectiles* projectiles)
+void Projectiles_destroy(Projectiles* projectiles)
   ;
 
 // Colisions
