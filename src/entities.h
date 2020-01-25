@@ -72,15 +72,15 @@ typedef struct {
   Explosion arr[MAX_EXPLOSIONS];
 } Explosions;
 
-Explosions* init_explosions(SDL_Renderer* ren)
+Explosions* Explosions_init(SDL_Renderer* ren)
   ;
-void destroy_explosions(Explosions* explosions)
+void Explosions_destroy(Explosions* explosions)
   ;
-void create_explosion(Explosions* explosions, ExplosionType type, Vec pos)
+void Explosions_create(Explosions* explosions, ExplosionType type, Vec pos)
   ;
-void render_explosions(Explosions* explosions, bool keyframe, SDL_Renderer* ren)
+void Explosions_render(Explosions* explosions, bool keyframe, SDL_Renderer* ren)
   ;
-ExplosionType generate_explosion_type()
+ExplosionType Explosions_generate_type()
   ;
 
 // Projectiles

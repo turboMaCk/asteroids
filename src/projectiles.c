@@ -37,7 +37,7 @@ Projectiles* colide_asteroids(Asteroids* asteroids, Projectiles* projectiles, Ex
     } else {
       if (next == NULL && prev != NULL) prev->tail = NULL;
       free(projectiles);
-      create_explosion(explosions, generate_explosion_type(), position);
+      Explosions_create(explosions, Explosions_generate_type(), position);
     }
 
     projectiles = next;

@@ -1,7 +1,7 @@
 #include "entities.h"
 #include <SDL_image.h>
 
-Explosions* init_explosions(SDL_Renderer* ren)
+Explosions* Explosions_init(SDL_Renderer* ren)
 {
   Explosions* res = malloc(sizeof(Explosions));
   res->size = 0;
@@ -14,7 +14,7 @@ Explosions* init_explosions(SDL_Renderer* ren)
   return res;
 }
 
-void destroy_explosions(Explosions* explosions)
+void Explosions_destroy(Explosions* explosions)
 {
   SDL_DestroyTexture(explosions->texture_small);
   SDL_DestroyTexture(explosions->texture_big);
@@ -29,7 +29,7 @@ void destroy_explosions(Explosions* explosions)
    and rest of the array is reorganized
    from start to end
 */
-void create_explosion(Explosions* explosions, ExplosionType type, Vec pos)
+void Explosions_create(Explosions* explosions, ExplosionType type, Vec pos)
 {
   // Configure based on texture
   uint radius, duration;
@@ -87,7 +87,7 @@ void create_explosion(Explosions* explosions, ExplosionType type, Vec pos)
   }
 }
 
-ExplosionType generate_explosion_type()
+ExplosionType Explosions_generate_type()
 {
   ExplosionType explosion_type;
   switch (rand() % 3 + 1) {
@@ -108,7 +108,7 @@ ExplosionType generate_explosion_type()
   return explosion_type;
 }
 
-SDL_Texture* get_explosion_texture(Explosions* explosions, ExplosionType type)
+SDL_Texture* Explosions_get_texture(Explosions* explosions, ExplosionType type)
 {
   switch (type) {
   case ExplosionSmall: {
@@ -127,7 +127,7 @@ SDL_Texture* get_explosion_texture(Explosions* explosions, ExplosionType type)
   }
 }
 
-void render_explosions(Explosions* explosions, bool keyframe, SDL_Renderer* ren)
+void Explosions_render(Explosions* explosions, bool keyframe, SDL_Renderer* ren)
 {
   for (uint i = 0; i < explosions->size; ++i) {
     Explosion* explosion = &explosions->arr[i];
@@ -144,7 +144,7 @@ void render_explosions(Explosions* explosions, bool keyframe, SDL_Renderer* ren)
                        .h = d,
       };
 
-      SDL_RenderCopy(ren, get_explosion_texture(explosions, explosion->type), &src, &dest);
+      SDL_RenderCopy(ren, Explosions_get_texture(explosions, explosion->type), &src, &dest);
 
       if (keyframe) {
         if (explosion->tick < explosion->duration) {

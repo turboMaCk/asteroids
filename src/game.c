@@ -62,7 +62,7 @@ Game* Game_init(SDL_Renderer* ren)
 
   game->running = false;
   game->ship = init_ship(ship_pos, ren);
-  game->explosions = init_explosions(ren);
+  game->explosions = Explosions_init(ren);
   game->asteroids = Asteroids_init(ren);
   game->projectiles = NULL;
   game->projectile_texture = IMG_LoadTexture(ren, "images/spaceship.png");
@@ -109,7 +109,7 @@ void Game_update(Game* game,
   // Ship collision with asteroids
   if (circle_colide_with_asteroids(game->asteroids, game->ship.pos, 24)) {
     printf("Game over\n");
-    create_explosion(game->explosions, ExplosionHuge, game->ship.pos);
+    Explosions_create(game->explosions, ExplosionHuge, game->ship.pos);
   }
 }
 
@@ -120,7 +120,7 @@ void Game_render(Game* game, FpsCounter* fps, SDL_Renderer* ren)
   render_projectiles(game->projectiles, game->projectile_texture, ren);
   Asteroids_render(game->asteroids, fps->keyframe, ren);
   render_ship(&game->ship, ren);
-  render_explosions(game->explosions, fps->keyframe, ren);
+  Explosions_render(game->explosions, fps->keyframe, ren);
 
   SDL_RenderPresent(ren);
 }
@@ -130,7 +130,7 @@ void Game_destory(Game *game)
   SDL_DestroyTexture(game->projectile_texture);
 
   destroy_ship(&game->ship);
-  destroy_explosions(game->explosions);
+  Explosions_destroy(game->explosions);
   Asteroids_destroy(game->asteroids);
   destroy_projectiles(game->projectiles);
 }

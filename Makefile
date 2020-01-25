@@ -15,11 +15,13 @@ CFLAGS = \
 ODIR = obj
 INCDIR = include
 SRCDIR = src
+LIBDIR = lib
 OUTDIR = build
 
 # Helper variables
 
-SOURCE = $(wildcard $(SRCDIR)/*.c)
+SOURCE = $(wildcard $(SRCDIR)/*.c) $(wildcard $(LIBDIR)/*.c)
+DEPS = $(wildcard $(INCDIR)/*.h)
 
 # Libraries
 
@@ -31,7 +33,7 @@ all: $(OUTDIR)/asteroids
 
 # Compile Objects
 
-$(ODIR)/main.o: $(SOURCE)
+$(ODIR)/main.o: $(SOURCE) $(DEPS)
 	@echo $(SOURCE)
 	$(CC) -c -o $@ $< $(CFLAGS) -I$(INCDIR) `sdl2-config --cflags`
 
