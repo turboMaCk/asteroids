@@ -17,7 +17,7 @@ Input Input_init()
   ;
 bool Input_is_firing(Input *input)
   ;
-void Input_init_controllers()
+bool Input_init_controllers()
   ;
 void Input_controller_handler(SDL_Event* event, Input* input)
   ;

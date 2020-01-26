@@ -82,10 +82,11 @@ void Input_keyboard_handler(SDL_Event* event, Input* input)
 
 // Controllers
 
-void Input_init_controllers()
+bool Input_init_controllers()
 {
   SDL_GameController *controller = NULL;
 
+  bool has_controller = false;
   for (int i = 0; i < SDL_NumJoysticks(); ++i) {
     if (SDL_IsGameController(i)) {
       char *mapping;
@@ -94,19 +95,21 @@ void Input_init_controllers()
       mapping = SDL_GameControllerMapping(controller);
       SDL_Log("Controller %i is mapped as \"%s\".", i, mapping);
       SDL_free(mapping);
+      has_controller = true;
     } else {
       SDL_Log("Index \'%i\' is not a compatible controller.", i);
     }
   }
+
+  return has_controller;
 }
 
 void Input_controller_handler(SDL_Event* event, Input* input)
 {
   switch (event->type) {
 
-    // movement
   case SDL_CONTROLLERAXISMOTION: {
-    //thrust
+    // thrust
     if (event->caxis.axis == SDL_CONTROLLER_AXIS_LEFTY) {
       input->thrust = ((float) (event->caxis.value / -3000))/10;
     }
@@ -119,17 +122,57 @@ void Input_controller_handler(SDL_Event* event, Input* input)
     printf("Thrust is %f, Rotation is %f\n", input->thrust, input->rotation);
   } break;
 
-    // firing
+
   case SDL_CONTROLLERBUTTONDOWN: {
-    if (event->cbutton.button == SDL_CONTROLLER_BUTTON_A) {
+    switch (event->cbutton.button) {
+
+      // firing
+    case SDL_CONTROLLER_BUTTON_A: {
       input->fire = true;
       input->count++;
+    } break;
+
+      // thrust
+    case SDL_CONTROLLER_BUTTON_DPAD_UP: {
+      input->thrust = 1;
+    } break;
+    case SDL_CONTROLLER_BUTTON_DPAD_DOWN: {
+      input->thrust = -1;
+    } break;
+
+      // rotation
+    case SDL_CONTROLLER_BUTTON_DPAD_LEFT: {
+      input->rotation = -1;
+    } break;
+    case SDL_CONTROLLER_BUTTON_DPAD_RIGHT: {
+      input->rotation = 1;
+    } break;
     }
   } break;
   case SDL_CONTROLLERBUTTONUP: {
-    if (event->cbutton.button == SDL_CONTROLLER_BUTTON_A) {
+    switch (event->cbutton.button) {
+
+      // firing
+    case SDL_CONTROLLER_BUTTON_A: {
       input->fire = false;
       input->count = 0;
+    } break;
+
+      // thrust
+    case SDL_CONTROLLER_BUTTON_DPAD_UP: {
+      input->thrust = 0;
+    } break;
+    case SDL_CONTROLLER_BUTTON_DPAD_DOWN: {
+      input->thrust = 0;
+    } break;
+
+      // rotation
+    case SDL_CONTROLLER_BUTTON_DPAD_LEFT: {
+      input->rotation = 0;
+    } break;
+    case SDL_CONTROLLER_BUTTON_DPAD_RIGHT: {
+      input->rotation = 0;
+    } break;
     }
   } break;
   }
