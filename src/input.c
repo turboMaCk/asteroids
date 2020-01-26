@@ -25,6 +25,33 @@ void Input_keyboard_handler(SDL_Event* event, Input* input)
 {
   switch (event->type) {
 
+    // key pressed
+  case SDL_KEYDOWN: {
+    switch (event->key.keysym.sym) {
+    case SDLK_a:
+    case SDLK_LEFT: {
+      input->rotation = -1;
+    } break;
+    case SDLK_d:
+    case SDLK_RIGHT: {
+      input->rotation = 1;
+    } break;
+    case SDLK_w:
+    case SDLK_UP: {
+      input->thrust = 1;
+    } break;
+    case SDLK_s:
+    case SDLK_DOWN: {
+      input->thrust = -1;
+    } break;
+    case SDLK_SPACE: {
+      input->fire = true;
+      input->count++;
+    }
+    }
+  } break;
+
+    // key pulled
   case SDL_KEYUP: {
     switch (event->key.keysym.sym) {
     case SDLK_a:
@@ -50,30 +77,60 @@ void Input_keyboard_handler(SDL_Event* event, Input* input)
     }
   }; break;
 
-  case SDL_KEYDOWN: {
-    switch (event->key.keysym.sym) {
-    case SDLK_a:
-    case SDLK_LEFT: {
-      input->rotation = -1;
-    } break;
-    case SDLK_d:
-    case SDLK_RIGHT: {
-      input->rotation = 1;
-    } break;
-    case SDLK_w:
-    case SDLK_UP: {
-      input->thrust = 1;
-    } break;
-    case SDLK_s:
-    case SDLK_DOWN: {
-      input->thrust = -1;
-    } break;
-    case SDLK_SPACE: {
+  }
+}
+
+// Controllers
+
+void Input_init_controllers()
+{
+  SDL_GameController *controller = NULL;
+
+  for (int i = 0; i < SDL_NumJoysticks(); ++i) {
+    if (SDL_IsGameController(i)) {
+      char *mapping;
+      SDL_Log("Index \'%i\' is a compatible controller, named \'%s\'", i, SDL_GameControllerNameForIndex(i));
+      controller = SDL_GameControllerOpen(i);
+      mapping = SDL_GameControllerMapping(controller);
+      SDL_Log("Controller %i is mapped as \"%s\".", i, mapping);
+      SDL_free(mapping);
+    } else {
+      SDL_Log("Index \'%i\' is not a compatible controller.", i);
+    }
+  }
+}
+
+void Input_controller_handler(SDL_Event* event, Input* input)
+{
+  switch (event->type) {
+
+    // movement
+  case SDL_CONTROLLERAXISMOTION: {
+    //thrust
+    if (event->caxis.axis == SDL_CONTROLLER_AXIS_LEFTY) {
+      input->thrust = ((float) (event->caxis.value / -3000))/10;
+    }
+
+    // rotation
+    if (event->caxis.axis == SDL_CONTROLLER_AXIS_LEFTX) {
+      input->rotation = ((float) (event->caxis.value / 3000)) / 10;
+    }
+
+    printf("Thrust is %f, Rotation is %f\n", input->thrust, input->rotation);
+  } break;
+
+    // firing
+  case SDL_CONTROLLERBUTTONDOWN: {
+    if (event->cbutton.button == SDL_CONTROLLER_BUTTON_A) {
       input->fire = true;
       input->count++;
     }
+  } break;
+  case SDL_CONTROLLERBUTTONUP: {
+    if (event->cbutton.button == SDL_CONTROLLER_BUTTON_A) {
+      input->fire = false;
+      input->count = 0;
     }
   } break;
   }
-
 }
