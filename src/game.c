@@ -100,14 +100,14 @@ void Game_update(Game* game,
                                          win_width,
                                          win_height,
                                          fps->speed);
-  game->projectiles = colide_asteroids(game->asteroids,
+  game->projectiles = Collisions_projectile_asteroids(game->asteroids,
                                        game->projectiles,
                                        game->explosions,
                                        win_width,
                                        win_height);
 
   // Ship collision with asteroids
-  if (circle_colide_with_asteroids(game->asteroids, game->ship.pos, 24)) {
+  if (Collisions_asteroids_circle(game->asteroids, game->ship.pos, 24)) {
     printf("Game over\n");
     Explosions_create(game->explosions, ExplosionHuge, game->ship.pos);
   }

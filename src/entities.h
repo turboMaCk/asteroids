@@ -109,12 +109,18 @@ void Projectiles_destroy(Projectiles* projectiles)
 
 // Colisions
 
-bool projectile_colide_asteroids(Asteroids* asteroids, Vec vec, uint win_width, uint win_height)
+bool Collisions_asteroids_point(Asteroids* asteroids,
+                                Vec vec,
+                                uint win_width,
+                                uint win_height)
   ;
-// TODO: better name
-Projectiles* colide_asteroids(Asteroids* asteroids, Projectiles* projectiles, Explosions* explosions, uint win_width, uint win_height)
+Projectiles* Collisions_projectile_asteroids(Asteroids* asteroids,
+                                         Projectiles* projectiles,
+                                         Explosions* explosions,
+                                         uint win_width,
+                                         uint win_height)
   ;
-bool circle_colide_with_asteroids(Asteroids* asteroids, Vec pos, uint r)
+bool Collisions_asteroids_circle(Asteroids* asteroids, Vec pos, uint r)
   ;
 
 #endif // _ENTITIES_H_

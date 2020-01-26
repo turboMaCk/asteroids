@@ -1,10 +1,10 @@
-#include "entities.h"
-
 #include <SDL2/SDL.h>
 #include <SDL_image.h>
 #include <stdbool.h>
 #include <math.h>
 #include <vec.h>
+
+#include "entities.h"
 
 Asteroids* Asteroids_init(SDL_Renderer* ren)
 {
@@ -168,67 +168,4 @@ void Asteroids_render(Asteroids* asteroids, bool keyframe, SDL_Renderer* ren)
       SDL_RenderCopy(ren, Asteroids_get_texture(asteroids, asteroid->type), &src, &dest);
     }
   }
-}
-
-// TODO: move
-bool projectile_colide_asteroids(Asteroids* asteroids, Vec vec, uint win_width, uint win_height)
-{
-  Asteroid* asteroid = asteroids->asteroids;
-  bool res = false;
-
-  for (uint i = 0; i < asteroids->size; i++) {
-    // skip destroyed
-    if (!asteroid->destroyed) {
-      Vec apos = asteroid->pos;
-      uint r = asteroid->radius;
-
-      // test collision
-      if ((powf(apos.x - vec.x, 2) + powf(apos.y - vec.y, 2)) <= r*r ) {
-        asteroid->destroyed = true;
-        res = true;
-
-        // create new asteroids
-        if (asteroid->type == AsteroidLarge) {
-          int num = rand() % 3 + 1;
-
-          // Small pieces from large asteroid
-          while (num) {
-            Asteroids_create(asteroids, AsteroidSmall, asteroid->pos);
-            num--;
-          }
-
-          // new large asteroid
-          Asteroids_create_random(asteroids, win_width, win_height);
-        }
-        break;
-      }
-    }
-
-    // next asteroid
-    asteroid++;
-  }
-
-  return res;
-}
-
-// TODO: move
-bool circle_colide_with_asteroids(Asteroids* asteroids, Vec pos, uint r)
-{
-  Asteroid* asteroid = asteroids->asteroids;
-  for (uint i = 0; i < asteroids->size; i++) {
-    if (!asteroid->destroyed) {
-      uint dx = asteroid->pos.x - pos.x;
-      uint dy = asteroid->pos.y - pos.y;
-
-      double distance = sqrt((double) (dx * dx + dy * dy));
-
-      if (distance < r + asteroid->radius) {
-        asteroid->destroyed = true;
-        return true;
-      }
-    }
-    asteroid++;
-  }
-
-  return false;
 }

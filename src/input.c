@@ -118,8 +118,6 @@ void Input_controller_handler(SDL_Event* event, Input* input)
     if (event->caxis.axis == SDL_CONTROLLER_AXIS_LEFTX) {
       input->rotation = ((float) (event->caxis.value / 3000)) / 10;
     }
-
-    printf("Thrust is %f, Rotation is %f\n", input->thrust, input->rotation);
   } break;
 
 
