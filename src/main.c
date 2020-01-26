@@ -8,7 +8,6 @@
 #include "input.h"
 #include "ship.h"
 #include "entities.h"
-
 #include "game.h"
 
 #define WIN_WIDTH 1200;
@@ -29,6 +28,7 @@ void run_loop(Game* game, FpsCounter* fps, SDL_Window* win, SDL_Renderer* ren)
     while (SDL_PollEvent(&event)) {
       // Handle game input
       Input_keyboard_handler(&event, &input);
+      Input_controller_handler(&event, &input);
 
       switch (event.type) {
       case SDL_QUIT: {
@@ -78,7 +78,7 @@ int main()
   SDL_Window* win;
   SDL_Renderer* ren;
 
-  SDL_Init(SDL_INIT_VIDEO);
+  SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER);
 
   win = SDL_CreateWindow("Asteroids",
                          SDL_WINDOWPOS_CENTERED,
@@ -108,6 +108,7 @@ int main()
 
   FpsCounter* fps = FPSC_init();
   Game* game = Game_init(ren);
+  Input_init_controllers();
 
   run_loop(game, fps, win, ren);
 
