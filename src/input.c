@@ -1,4 +1,5 @@
 #include <SDL2/SDL.h>
+#include <math.h>
 #include <stdbool.h>
 #include "input.h"
 
@@ -82,26 +83,37 @@ void Input_keyboard_handler(SDL_Event* event, Input* input)
 
 // Controllers
 
-bool Input_init_controllers()
-{
-  SDL_GameController *controller = NULL;
+#define MAX_CONTROLLERS 12
 
-  bool has_controller = false;
-  for (int i = 0; i < SDL_NumJoysticks(); ++i) {
+SDL_GameController* Input_init_controllers()
+{
+  SDL_GameController* controller = NULL;
+  static SDL_GameController* controllers[MAX_CONTROLLERS] = {NULL};
+
+  int count = 0;
+  for (int i = 0; i < fmin(MAX_CONTROLLERS, SDL_NumJoysticks()); ++i) {
     if (SDL_IsGameController(i)) {
       char *mapping;
+
       SDL_Log("Index \'%i\' is a compatible controller, named \'%s\'", i, SDL_GameControllerNameForIndex(i));
       controller = SDL_GameControllerOpen(i);
       mapping = SDL_GameControllerMapping(controller);
       SDL_Log("Controller %i is mapped as \"%s\".", i, mapping);
       SDL_free(mapping);
-      has_controller = true;
+      controllers[count++] = controller;
     } else {
       SDL_Log("Index \'%i\' is not a compatible controller.", i);
     }
   }
 
-  return has_controller;
+  return (SDL_GameController *) controllers;
+}
+
+void Input_destroy_controllers(SDL_GameController* controllers)
+{
+  for (int i = 0; i < MAX_CONTROLLERS; ++i) {
+    SDL_GameControllerClose(controllers + i);
+  }
 }
 
 void Input_controller_handler(SDL_Event* event, Input* input)

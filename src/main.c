@@ -108,13 +108,14 @@ int main()
 
   FpsCounter* fps = FPSC_init();
   Game* game = Game_init(ren);
-  Input_init_controllers();
+  SDL_GameController* controllers = Input_init_controllers();
 
   run_loop(game, fps, win, ren);
 
   // Cleanup
   FPSC_destory(fps);
   Game_destory(game);
+  Input_destroy_controllers(controllers);
 
   // SDL stuff
   SDL_DestroyRenderer(ren);
