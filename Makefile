@@ -25,7 +25,7 @@ DEPS = $(wildcard $(INCDIR)/*.h)
 
 # Libraries
 
-LIBS = -lSDL2 -lSDL2_image -lm
+LIBS = -lSDL2 -lSDL2_image -lSDL2_ttf -lm
 
 # Build
 

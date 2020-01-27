@@ -20,7 +20,7 @@ Ship Ship_init(Vec pos, SDL_Renderer* ren)
   ;
 void Ship_update(Input* input, Ship* ship, float speed, uint win_width, uint win_height)
   ;
-void Ship_render(Ship* ship, SDL_Renderer* ren)
+void Ship_render(const Ship* ship, SDL_Renderer* ren)
   ;
 void Ship_destroy(Ship* ship)
   ;

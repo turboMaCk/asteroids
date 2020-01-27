@@ -23,7 +23,6 @@ void FPSC_update(FpsCounter* pcounter)
   ;
 
 typedef struct {
-  bool running;
   SDL_Texture* projectile_texture;
   Ship ship;
   Asteroids* asteroids;
@@ -35,9 +34,21 @@ Game* Game_init(SDL_Renderer* ren)
   ;
 void Game_start(Game* game, SDL_Window* window)
   ;
-void Game_update(Game* game, FpsCounter* fps_counter, Input input, int win_width, int win_height)
+void Game_loop(Game* game,
+               FpsCounter* fps_counter,
+               SDL_Renderer* ren,
+               int* pwin_width,
+               int* pwin_height)
   ;
-void Game_render(Game* game, FpsCounter* fps_counter, SDL_Renderer* renderer)
+void Game_update(Game* game,
+                 FpsCounter* fps_counter,
+                 Input input,
+                 int win_width,
+                 int win_height)
+  ;
+void Game_render(const Game* game,
+                 const FpsCounter* fps_counter,
+                 SDL_Renderer* renderer)
   ;
 void Game_destory(Game *game)
   ;

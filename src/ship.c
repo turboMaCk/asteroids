@@ -58,7 +58,7 @@ void Ship_update(Input* input, Ship* ship, float speed, uint win_width, uint win
   }
 }
 
-void Ship_render(Ship* ship, SDL_Renderer* ren)
+void Ship_render(const Ship* ship, SDL_Renderer* ren)
 {
     SDL_Rect src = {
                     .x = 38,

@@ -3,6 +3,7 @@
 #include <SDL2/SDL.h>
 #include <SDL_image.h>
 
+#include "window.h"
 #include "ship.h"
 #include "entities.h"
 #include "input.h"
@@ -60,7 +61,6 @@ Game* Game_init(SDL_Renderer* ren)
   Vec ship_pos = {0,0};
   Game* game = malloc(sizeof(Game));
 
-  game->running = false;
   game->ship = Ship_init(ship_pos, ren);
   game->explosions = Explosions_init(ren);
   game->asteroids = Asteroids_init(ren);
@@ -80,7 +80,6 @@ void Game_start(Game* game, SDL_Window* win)
 
   Asteroids_create_random(game->asteroids, win_width, win_height);
   game->ship.pos = ship_position;
-  game->running = true;
 }
 
 // TODO: return end game state
@@ -113,16 +112,12 @@ void Game_update(Game* game,
   }
 }
 
-void Game_render(Game* game, FpsCounter* fps, SDL_Renderer* ren)
+void Game_render(const Game* game, const FpsCounter* fps, SDL_Renderer* ren)
 {
-  SDL_RenderClear(ren);
-
   Projectiles_render(game->projectiles, game->projectile_texture, ren);
   Asteroids_render(game->asteroids, fps->keyframe, ren);
   Ship_render(&game->ship, ren);
   Explosions_render(game->explosions, fps->keyframe, ren);
-
-  SDL_RenderPresent(ren);
 }
 
 void Game_destory(Game *game)
@@ -133,4 +128,41 @@ void Game_destory(Game *game)
   Explosions_destroy(game->explosions);
   Asteroids_destroy(game->asteroids);
   Projectiles_destroy(game->projectiles);
+}
+
+void Game_loop(Game* game, FpsCounter* fps, SDL_Renderer* ren, int* pwin_width, int* pwin_height)
+{
+  Input input = Input_init();
+
+  bool running = true;
+  while (running) {
+    FPSC_update(fps);
+
+    SDL_Event event;
+    while (SDL_PollEvent(&event)) {
+      // Handle game input
+      Window_event_handler(&event, ren, pwin_width, pwin_height);
+      Input_keyboard_handler(&event, &input);
+      Input_controller_handler(&event, &input);
+
+      switch (event.type) {
+      case SDL_QUIT: {
+        running = false;
+      } break;
+      }
+    }
+
+    if (fps->keyframe && Input_is_firing(&input)) {
+      game->projectiles = Projectiles_create(game->projectiles,
+                                             game->ship.pos,
+                                             game->ship.vel,
+                                             game->ship.rotation);
+    }
+
+    Game_update(game, fps, input, *pwin_width, *pwin_height);
+
+    SDL_RenderClear(ren);
+    Game_render(game, fps, ren);
+    SDL_RenderPresent(ren);
+  }
 }
