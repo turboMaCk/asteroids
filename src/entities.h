@@ -109,18 +109,19 @@ void Projectiles_destroy(Projectiles* projectiles)
 
 // Colisions
 
-bool Collisions_asteroids_point(Asteroids* asteroids,
+Vec* Collisions_asteroids_point(Asteroids* asteroids,
                                 Vec vec,
                                 uint win_width,
                                 uint win_height)
   ;
-Projectiles* Collisions_projectile_asteroids(Asteroids* asteroids,
-                                         Projectiles* projectiles,
-                                         Explosions* explosions,
-                                         uint win_width,
-                                         uint win_height)
+Vec* Collisions_asteroids_circle(Asteroids* asteroids, Vec pos, uint r)
   ;
-bool Collisions_asteroids_circle(Asteroids* asteroids, Vec pos, uint r)
+Projectiles* Collisions_projectile_asteroids(Asteroids* asteroids,
+                                             Projectiles* projectiles,
+                                             Explosions* explosions,
+                                             Uint32* score,
+                                             uint win_width,
+                                             uint win_height)
   ;
 
 #endif // _ENTITIES_H_

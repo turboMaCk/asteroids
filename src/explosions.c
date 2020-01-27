@@ -90,17 +90,16 @@ void Explosions_create(Explosions* explosions, ExplosionType type, Vec pos)
 ExplosionType Explosions_generate_type()
 {
   ExplosionType explosion_type;
-  switch (rand() % 3 + 1) {
+  int rand_val = rand() % 2 + 1;
+  switch (rand_val) {
   case 1: {
     explosion_type = ExplosionBig;
   } break;
   case 2: {
     explosion_type = ExplosionHuge;
   } break;
-  case 3: {
-    explosion_type = ExplosionSmall;
-  } break;
   default: {
+    fprintf(stderr, "Default case in explosion generation reached for %d\n", rand_val);
     explosion_type = ExplosionBig;
   }
   }

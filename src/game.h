@@ -2,6 +2,7 @@
 #define _GAME_H_
 
 #include <SDL2/SDL.h>
+#include <SDL_ttf.h>
 #include "ship.h"
 #include "input.h"
 #include "entities.h"
@@ -22,22 +23,45 @@ void FPSC_destory(FpsCounter* counter)
 void FPSC_update(FpsCounter* pcounter)
   ;
 
+typedef enum {
+              GameNotStarted,
+              GameRunning,
+              GameEnded,
+              GamePaused,
+} GameStatus;
+
 typedef struct {
-  bool running;
+  GameStatus status;
   SDL_Texture* projectile_texture;
   Ship ship;
   Asteroids* asteroids;
   Explosions* explosions;
   Projectiles* projectiles;
+  Uint32 score;
+  TTF_Font* ui_font;
 } Game;
 
 Game* Game_init(SDL_Renderer* ren)
   ;
 void Game_start(Game* game, SDL_Window* window)
   ;
-void Game_update(Game* game, FpsCounter* fps_counter, Input input, int win_width, int win_height)
+void Game_loop(Game* game,
+               FpsCounter* fps_counter,
+               SDL_Renderer* ren,
+               int* pwin_width,
+               int* pwin_height)
   ;
-void Game_render(Game* game, FpsCounter* fps_counter, SDL_Renderer* renderer)
+void Game_update(Game* game,
+                 FpsCounter* fps_counter,
+                 Input input,
+                 int win_width,
+                 int win_height)
+  ;
+void Game_render(const Game* game,
+                 const FpsCounter* fps_counter,
+                 SDL_Renderer* renderer,
+                 int win_width,
+                 int win_height)
   ;
 void Game_destory(Game *game)
   ;

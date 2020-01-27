@@ -1,10 +1,10 @@
 #include <stdbool.h>
 #include "entities.h"
 
-bool Collisions_asteroids_point(Asteroids* asteroids, Vec vec, uint win_width, uint win_height)
+Vec* Collisions_asteroids_point(Asteroids* asteroids, Vec vec, uint win_width, uint win_height)
 {
   Asteroid* asteroid = asteroids->asteroids;
-  bool res = false;
+  Vec* res = NULL;
 
   for (uint i = 0; i < asteroids->size; i++) {
     // skip destroyed
@@ -15,7 +15,14 @@ bool Collisions_asteroids_point(Asteroids* asteroids, Vec vec, uint win_width, u
       // test collision
       if ((powf(apos.x - vec.x, 2) + powf(apos.y - vec.y, 2)) <= r*r ) {
         asteroid->destroyed = true;
-        res = true;
+
+        // We need to alocate new position because subsequent `Asteroids_crate`
+        // Call might overwrite the asteroids data with new which would cause
+        // pointer to point to incorrect value.
+        // This new memory must be freed after usage.
+        // TODO: think about nicer / easier to use way to solve this.
+        res = malloc(sizeof(Vec));
+        *res = asteroid->pos;
 
         // create new asteroids
         if (asteroid->type == AsteroidLarge) {
@@ -23,6 +30,8 @@ bool Collisions_asteroids_point(Asteroids* asteroids, Vec vec, uint win_width, u
 
           // Small pieces from large asteroid
           while (num) {
+            // TODO: this can potentially destoroy the `res` pointer???
+            Asteroids_create(asteroids, AsteroidSmall, asteroid->pos);
             Asteroids_create(asteroids, AsteroidSmall, asteroid->pos);
             num--;
           }
@@ -41,9 +50,11 @@ bool Collisions_asteroids_point(Asteroids* asteroids, Vec vec, uint win_width, u
   return res;
 }
 
-bool Collisions_asteroids_circle(Asteroids* asteroids, Vec pos, uint r)
+Vec* Collisions_asteroids_circle(Asteroids* asteroids, Vec pos, uint r)
 {
   Asteroid* asteroid = asteroids->asteroids;
+  Vec* res = NULL;
+
   for (uint i = 0; i < asteroids->size; i++) {
     if (!asteroid->destroyed) {
       uint dx = asteroid->pos.x - pos.x;
@@ -53,18 +64,24 @@ bool Collisions_asteroids_circle(Asteroids* asteroids, Vec pos, uint r)
 
       if (distance < r + asteroid->radius) {
         asteroid->destroyed = true;
-        return true;
+        // TODO: probably in this case we don't need to do the same thing
+        // as in `Collisions_asteroids_point`
+        // but only because this code is used for collision with ship
+        // this is not super robust design but should work.
+        res = &asteroid->pos;
+        break;
       }
     }
     asteroid++;
   }
 
-  return false;
+  return res;
 }
 
 Projectiles* Collisions_projectile_asteroids(Asteroids* asteroids,
                                              Projectiles* projectiles,
                                              Explosions* explosions,
+                                             Uint32* score,
                                              uint win_width,
                                              uint win_height)
 {
@@ -75,9 +92,8 @@ Projectiles* Collisions_projectile_asteroids(Asteroids* asteroids,
     Projectiles* next = (Projectiles*) projectiles->tail;
 
     // Check if projectile is on screen
-    Vec position = projectiles->head.pos;
-
-    if (!Collisions_asteroids_point(asteroids, position, win_width, win_height)) {
+    Vec* collision_point = Collisions_asteroids_point(asteroids, projectiles->head.pos, win_width, win_height);
+    if (!collision_point) {
       if (new_head == NULL) new_head = projectiles;
       if (prev != NULL) prev->tail = (struct Projectiles*) projectiles;
 
@@ -85,7 +101,13 @@ Projectiles* Collisions_projectile_asteroids(Asteroids* asteroids,
     } else {
       if (next == NULL && prev != NULL) prev->tail = NULL;
       free(projectiles);
-      Explosions_create(explosions, Explosions_generate_type(), position);
+      Explosions_create(explosions, Explosions_generate_type(), *collision_point);
+      // Here we're freeing the position copy.
+      // see comment in `Collisions_asteroids_point` for details
+      free(collision_point);
+
+      // increase score
+      ++*score;
     }
 
     projectiles = next;

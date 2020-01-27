@@ -5,66 +5,67 @@
 #include <math.h>
 #include <time.h>
 
+#include "window.h"
 #include "input.h"
 #include "ship.h"
 #include "entities.h"
 #include "game.h"
+#include "countdown.h"
+#include "menu.h"
 
-#define WIN_WIDTH 1200;
-#define WIN_HEIGHT 800;
+typedef enum {StateMenu, StateGame, StatePause} State;
 
-void run_loop(Game* game, FpsCounter* fps, SDL_Window* win, SDL_Renderer* ren)
+void run_loop(Game* game,
+              FpsCounter* fps,
+              SDL_Window* win,
+              SDL_Renderer* ren)
 {
   int win_width, win_height;
-  Input input = Input_init();
-  Game_start(game, win);
   SDL_GetWindowSize(win, &win_width, &win_height);
 
-  while (game->running) {
+  bool quit = false;
+  Countdown countdown = Countdown_init(ren);
+  Menu* menu = NULL;
+
+  while (!quit) {
     FPSC_update(fps);
 
-    // HANDLE EVENTS
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
       // Handle game input
-      Input_keyboard_handler(&event, &input);
-      Input_controller_handler(&event, &input);
+      Window_event_handler(&event, ren, &win_width, &win_height);
 
       switch (event.type) {
       case SDL_QUIT: {
-        game->running = false;
-      } break;
-      case SDL_WINDOWEVENT: {
-        if (event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED) {
-          win_width = event.window.data1;
-          win_height = event.window.data2;
-          // we should use ints here!
-          int scale = win_width / WIN_WIDTH;
-
-          // scale can be at least 1
-          scale = scale < 1 ? 1 : scale;
-          win_height /= scale;
-          win_width /= scale;
-
-          // Error when scaling
-          if (SDL_RenderSetScale(ren, scale, scale)) {
-            SDL_Log("SetScale Error %s", SDL_GetError());
-          }
-        }
+        quit = true;
       } break;
       }
     }
-
-    if (fps->keyframe && Input_is_firing(&input)) {
-      game->projectiles = Projectiles_create(game->projectiles,
-                                             game->ship.pos,
-                                             game->ship.vel,
-                                             game->ship.rotation);
+    switch (game->status) {
+    case GameRunning: {
+      Game_loop(game, fps, ren, &win_width, &win_height);
+      Countdown_restart(&countdown);
+    } break;
+    case GameEnded: {
+      if (!menu) menu = Menu_init(ren, game);
+      SDL_RenderClear(ren);
+      Game_render(game, fps, ren, win_width, win_height);
+      Menu_render(menu, ren, win_width, win_height);
+      SDL_RenderPresent(ren);
+    } break;
+      // GameNotStarted
+    default: {
+      SDL_RenderClear(ren);
+      Game_render(game, fps, ren, win_width, win_height);
+      if (Countdown_render(&countdown, ren, win_width, win_height)) {
+        Game_start(game, win);
+      }
+      SDL_RenderPresent(ren);
+    };
     }
-
-    Game_update(game, fps, input, win_width, win_height);
-    Game_render(game, fps, ren);
   }
+
+  Contdown_destroy(&countdown);
 }
 
 int main()
@@ -78,7 +79,15 @@ int main()
   SDL_Window* win;
   SDL_Renderer* ren;
 
+  // Init SDL
   SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER);
+
+  // Init TTF
+  if (TTF_Init() != 0){
+    SDL_Log("Error during TTF initialization");
+    SDL_Quit();
+    return 1;
+  }
 
   win = SDL_CreateWindow("Asteroids",
                          SDL_WINDOWPOS_CENTERED,
@@ -108,18 +117,18 @@ int main()
 
   FpsCounter* fps = FPSC_init();
   Game* game = Game_init(ren);
-  Input_init_controllers();
+  SDL_GameController** controllers = Input_init_controllers();
 
   run_loop(game, fps, win, ren);
 
   // Cleanup
   FPSC_destory(fps);
   Game_destory(game);
+  Input_destroy_controllers(controllers);
 
   // SDL stuff
   SDL_DestroyRenderer(ren);
   SDL_DestroyWindow(win);
   SDL_Quit();
-
   return 0;
 }
