@@ -11,6 +11,7 @@
 #include "entities.h"
 #include "game.h"
 #include "countdown.h"
+#include "menu.h"
 
 typedef enum {StateMenu, StateGame, StatePause} State;
 
@@ -22,10 +23,9 @@ void run_loop(Game* game,
   int win_width, win_height;
   SDL_GetWindowSize(win, &win_width, &win_height);
 
-  Game_start(game, win);
-
   bool quit = false;
   Countdown countdown = Countdown_init(ren);
+  Menu* menu = NULL;
 
   while (!quit) {
     FPSC_update(fps);
@@ -41,18 +41,27 @@ void run_loop(Game* game,
       } break;
       }
     }
-
-    // render game
-    if (game->status == GameRunning) {
+    switch (game->status) {
+    case GameRunning: {
       Game_loop(game, fps, ren, &win_width, &win_height);
       Countdown_restart(&countdown);
-    } else {
+    } break;
+    case GameEnded: {
+      if (!menu) menu = Menu_init(ren, game);
+      SDL_RenderClear(ren);
+      Game_render(game, fps, ren, win_width, win_height);
+      Menu_render(menu, ren, win_width, win_height);
+      SDL_RenderPresent(ren);
+    } break;
+      // GameNotStarted
+    default: {
       SDL_RenderClear(ren);
       Game_render(game, fps, ren, win_width, win_height);
       if (Countdown_render(&countdown, ren, win_width, win_height)) {
-        game->status = GameRunning;
+        Game_start(game, win);
       }
       SDL_RenderPresent(ren);
+    };
     }
   }
 

@@ -85,6 +85,7 @@ void Game_start(Game* game, SDL_Window* win)
 
   Asteroids_create_random(game->asteroids, win_width, win_height);
   game->ship.pos = ship_position;
+  game->status = GameRunning;
 }
 
 void Game_update(Game* game,
@@ -113,7 +114,6 @@ void Game_update(Game* game,
   // Ship collision with asteroids
   Vec* asteroid_collision_position = Collisions_asteroids_circle(game->asteroids, game->ship.pos, 24);
   if (asteroid_collision_position) {
-    printf("Game over\n");
     Explosions_create(game->explosions, Explosions_generate_type(), *asteroid_collision_position);
     Explosions_create(game->explosions, ExplosionHuge, game->ship.pos);
     game->status = GameEnded;
@@ -147,7 +147,8 @@ void Game_render(const Game* game,
 {
   Projectiles_render(game->projectiles, game->projectile_texture, ren);
   Asteroids_render(game->asteroids, fps->keyframe, ren);
-  Ship_render(&game->ship, ren);
+  if (game->status == GameRunning || game->status == GamePaused)
+    Ship_render(&game->ship, ren);
   Explosions_render(game->explosions, fps->keyframe, ren);
   Game_render_ui(game, ren, win_width);
 }

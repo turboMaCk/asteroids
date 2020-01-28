@@ -32,6 +32,7 @@ Vec* Collisions_asteroids_point(Asteroids* asteroids, Vec vec, uint win_width, u
           while (num) {
             // TODO: this can potentially destoroy the `res` pointer???
             Asteroids_create(asteroids, AsteroidSmall, asteroid->pos);
+            Asteroids_create(asteroids, AsteroidSmall, asteroid->pos);
             num--;
           }
 
