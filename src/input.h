@@ -17,7 +17,9 @@ Input Input_init()
   ;
 bool Input_is_firing(Input *input)
   ;
-bool Input_init_controllers()
+SDL_GameController** Input_init_controllers()
+  ;
+void Input_destroy_controllers(SDL_GameController** controllers)
   ;
 void Input_controller_handler(SDL_Event* event, Input* input)
   ;

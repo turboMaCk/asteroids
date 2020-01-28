@@ -128,6 +128,7 @@ void Game_destory(Game *game)
   Explosions_destroy(game->explosions);
   Asteroids_destroy(game->asteroids);
   Projectiles_destroy(game->projectiles);
+  free(game);
 }
 
 void Game_loop(Game* game, FpsCounter* fps, SDL_Renderer* ren, int* pwin_width, int* pwin_height)

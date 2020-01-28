@@ -32,7 +32,7 @@ void Countdown_restart(Countdown* countdown)
 void Contdown_destroy(Countdown *countdown)
 {
   TTF_CloseFont(countdown->font);
-  for (int i = 0; i <= COUNTDOWN; ++i) {
+  for (int i = 0; i < COUNTDOWN; ++i) {
     SDL_DestroyTexture(countdown->textures[i]);
   }
 }

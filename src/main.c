@@ -14,7 +14,10 @@
 
 typedef enum {StateMenu, StateGame, StatePause} State;
 
-void run_loop(Game* game, FpsCounter* fps, SDL_Window* win, SDL_Renderer* ren)
+void run_loop(Game* game,
+              FpsCounter* fps,
+              SDL_Window* win,
+              SDL_Renderer* ren)
 {
   int win_width, win_height;
   SDL_GetWindowSize(win, &win_width, &win_height);
@@ -44,8 +47,8 @@ void run_loop(Game* game, FpsCounter* fps, SDL_Window* win, SDL_Renderer* ren)
     // render game
     if (playing) {
       Game_loop(game, fps, ren, &win_width, &win_height);
-      playing = false;
       Countdown_restart(&countdown);
+      playing = false;
     } else {
       SDL_RenderClear(ren);
       Game_render(game, fps, ren);
@@ -108,13 +111,14 @@ int main()
 
   FpsCounter* fps = FPSC_init();
   Game* game = Game_init(ren);
-  Input_init_controllers();
+  SDL_GameController** controllers = Input_init_controllers();
 
   run_loop(game, fps, win, ren);
 
   // Cleanup
   FPSC_destory(fps);
   Game_destory(game);
+  Input_destroy_controllers(controllers);
 
   // SDL stuff
   SDL_DestroyRenderer(ren);
