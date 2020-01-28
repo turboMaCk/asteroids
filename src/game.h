@@ -23,7 +23,15 @@ void FPSC_destory(FpsCounter* counter)
 void FPSC_update(FpsCounter* pcounter)
   ;
 
+typedef enum {
+              GameNotStarted,
+              GameRunning,
+              GameEnded,
+              GamePaused,
+} GameStatus;
+
 typedef struct {
+  GameStatus status;
   SDL_Texture* projectile_texture;
   Ship ship;
   Asteroids* asteroids;

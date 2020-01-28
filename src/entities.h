@@ -8,7 +8,7 @@
 
 // ASTEROIDS
 
-#define MAX_ASTEROIDS 3
+#define MAX_ASTEROIDS 64
 
 typedef enum {
               AsteroidSmall,

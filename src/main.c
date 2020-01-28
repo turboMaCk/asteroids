@@ -25,8 +25,6 @@ void run_loop(Game* game,
   Game_start(game, win);
 
   bool quit = false;
-  bool playing = false;
-
   Countdown countdown = Countdown_init(ren);
 
   while (!quit) {
@@ -45,15 +43,14 @@ void run_loop(Game* game,
     }
 
     // render game
-    if (playing) {
+    if (game->status == GameRunning) {
       Game_loop(game, fps, ren, &win_width, &win_height);
       Countdown_restart(&countdown);
-      playing = false;
     } else {
       SDL_RenderClear(ren);
       Game_render(game, fps, ren, win_width, win_height);
       if (Countdown_render(&countdown, ren, win_width, win_height)) {
-        playing = true;
+        game->status = GameRunning;
       }
       SDL_RenderPresent(ren);
     }

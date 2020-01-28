@@ -63,6 +63,7 @@ Game* Game_init(SDL_Renderer* ren)
   // TODO: this might fail and should be handled
   TTF_Font* font = TTF_OpenFont("fonts/Monda-Regular.ttf", 22);
 
+  game->status = GameNotStarted;
   game->ship = Ship_init(ship_pos, ren);
   game->explosions = Explosions_init(ren);
   game->asteroids = Asteroids_init(ren);
@@ -86,7 +87,6 @@ void Game_start(Game* game, SDL_Window* win)
   game->ship.pos = ship_position;
 }
 
-// TODO: return end game state
 void Game_update(Game* game,
                  FpsCounter* fps,
                  Input input,
@@ -111,12 +111,12 @@ void Game_update(Game* game,
                                                       win_height);
 
   // Ship collision with asteroids
-  // TODO game should end there
   Vec* asteroid_collision_position = Collisions_asteroids_circle(game->asteroids, game->ship.pos, 24);
   if (asteroid_collision_position) {
     printf("Game over\n");
     Explosions_create(game->explosions, Explosions_generate_type(), *asteroid_collision_position);
     Explosions_create(game->explosions, ExplosionHuge, game->ship.pos);
+    game->status = GameEnded;
   }
 }
 
@@ -136,6 +136,7 @@ void Game_render_ui(const Game* game, SDL_Renderer* ren, int win_width)
   SDL_QueryTexture(texture, NULL, NULL, &width, &height);
   SDL_Rect dest = {win_width - width - 32, 24, width, height};
   SDL_RenderCopy(ren, texture, NULL, &dest);
+  SDL_DestroyTexture(texture);
 }
 
 void Game_render(const Game* game,
@@ -154,6 +155,7 @@ void Game_render(const Game* game,
 void Game_destory(Game *game)
 {
   SDL_DestroyTexture(game->projectile_texture);
+  TTF_CloseFont(game->ui_font);
 
   Ship_destroy(&game->ship);
   Explosions_destroy(game->explosions);
@@ -166,8 +168,7 @@ void Game_loop(Game* game, FpsCounter* fps, SDL_Renderer* ren, int* pwin_width, 
 {
   Input input = Input_init();
 
-  bool running = true;
-  while (running) {
+  while (game->status == GameRunning) {
     FPSC_update(fps);
 
     SDL_Event event;
@@ -179,7 +180,7 @@ void Game_loop(Game* game, FpsCounter* fps, SDL_Renderer* ren, int* pwin_width, 
 
       switch (event.type) {
       case SDL_QUIT: {
-        running = false;
+        game->status = GamePaused;
       } break;
       }
     }
