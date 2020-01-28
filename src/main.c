@@ -51,7 +51,7 @@ void run_loop(Game* game,
       playing = false;
     } else {
       SDL_RenderClear(ren);
-      Game_render(game, fps, ren);
+      Game_render(game, fps, ren, win_width, win_height);
       if (Countdown_render(&countdown, ren, win_width, win_height)) {
         playing = true;
       }

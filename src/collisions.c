@@ -80,6 +80,7 @@ Vec* Collisions_asteroids_circle(Asteroids* asteroids, Vec pos, uint r)
 Projectiles* Collisions_projectile_asteroids(Asteroids* asteroids,
                                              Projectiles* projectiles,
                                              Explosions* explosions,
+                                             Uint32* score,
                                              uint win_width,
                                              uint win_height)
 {
@@ -103,6 +104,9 @@ Projectiles* Collisions_projectile_asteroids(Asteroids* asteroids,
       // Here we're freeing the position copy.
       // see comment in `Collisions_asteroids_point` for details
       free(collision_point);
+
+      // increase score
+      ++*score;
     }
 
     projectiles = next;

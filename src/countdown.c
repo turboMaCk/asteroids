@@ -11,11 +11,11 @@ Countdown Countdown_init(SDL_Renderer* ren)
   res.font = font;
   res.started = SDL_GetTicks();
 
+  SDL_Color color = {255,255,255,255};
   // Loop from highest to 0
   for (int i = COUNTDOWN; i > 0; --i) {
     char to_start_str[10];
     snprintf(to_start_str, 10, "%d", i - 1);
-    SDL_Color color = {255,255,255,255};
     SDL_Surface* surf = TTF_RenderText_Blended(font, to_start_str, color);
     res.textures[COUNTDOWN - i] = SDL_CreateTextureFromSurface(ren, surf);
     SDL_FreeSurface(surf);
@@ -46,8 +46,7 @@ bool Countdown_render(Countdown *c, SDL_Renderer* ren, int win_width, int win_he
   if (index >= COUNTDOWN) return true;
 
   SDL_Texture* texture = c->textures[index];
-  int width;
-  int height;
+  int width, height;
 
   SDL_QueryTexture(texture, NULL, NULL, &width, &height);
   SDL_Rect dest = {win_width/2 - width/2, win_height/2 - height/2, width, height};

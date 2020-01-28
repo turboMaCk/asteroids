@@ -2,6 +2,7 @@
 #define _GAME_H_
 
 #include <SDL2/SDL.h>
+#include <SDL_ttf.h>
 #include "ship.h"
 #include "input.h"
 #include "entities.h"
@@ -28,6 +29,8 @@ typedef struct {
   Asteroids* asteroids;
   Explosions* explosions;
   Projectiles* projectiles;
+  Uint32 score;
+  TTF_Font* ui_font;
 } Game;
 
 Game* Game_init(SDL_Renderer* ren)
@@ -48,7 +51,9 @@ void Game_update(Game* game,
   ;
 void Game_render(const Game* game,
                  const FpsCounter* fps_counter,
-                 SDL_Renderer* renderer)
+                 SDL_Renderer* renderer,
+                 int win_width,
+                 int win_height)
   ;
 void Game_destory(Game *game)
   ;

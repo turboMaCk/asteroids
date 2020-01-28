@@ -60,12 +60,16 @@ Game* Game_init(SDL_Renderer* ren)
 {
   Vec ship_pos = {0,0};
   Game* game = malloc(sizeof(Game));
+  // TODO: this might fail and should be handled
+  TTF_Font* font = TTF_OpenFont("fonts/Monda-Regular.ttf", 22);
 
   game->ship = Ship_init(ship_pos, ren);
   game->explosions = Explosions_init(ren);
   game->asteroids = Asteroids_init(ren);
   game->projectiles = NULL;
   game->projectile_texture = IMG_LoadTexture(ren, "images/spaceship.png");
+  game->score = 0;
+  game->ui_font = font;
 
   return game;
 }
@@ -100,12 +104,14 @@ void Game_update(Game* game,
                                          win_height,
                                          fps->speed);
   game->projectiles = Collisions_projectile_asteroids(game->asteroids,
-                                       game->projectiles,
-                                       game->explosions,
-                                       win_width,
-                                       win_height);
+                                                      game->projectiles,
+                                                      game->explosions,
+                                                      &game->score,
+                                                      win_width,
+                                                      win_height);
 
   // Ship collision with asteroids
+  // TODO game should end there
   Vec* asteroid_collision_position = Collisions_asteroids_circle(game->asteroids, game->ship.pos, 24);
   if (asteroid_collision_position) {
     printf("Game over\n");
@@ -114,12 +120,35 @@ void Game_update(Game* game,
   }
 }
 
-void Game_render(const Game* game, const FpsCounter* fps, SDL_Renderer* ren)
+void Game_render_ui(const Game* game, SDL_Renderer* ren, int win_width)
+{
+  SDL_Color color = {255,255,255,255};
+
+  // Initialize texture
+  char text[32];
+  snprintf(text, 10, "Score: %d", game->score);
+  SDL_Surface* surf = TTF_RenderText_Blended(game->ui_font, text, color);
+  SDL_Texture* texture = SDL_CreateTextureFromSurface(ren, surf);
+  SDL_FreeSurface(surf);
+
+  // render texture
+  int width, height;
+  SDL_QueryTexture(texture, NULL, NULL, &width, &height);
+  SDL_Rect dest = {win_width - width - 32, 24, width, height};
+  SDL_RenderCopy(ren, texture, NULL, &dest);
+}
+
+void Game_render(const Game* game,
+                 const FpsCounter* fps,
+                 SDL_Renderer* ren,
+                 int win_width,
+                 int win_height)
 {
   Projectiles_render(game->projectiles, game->projectile_texture, ren);
   Asteroids_render(game->asteroids, fps->keyframe, ren);
   Ship_render(&game->ship, ren);
   Explosions_render(game->explosions, fps->keyframe, ren);
+  Game_render_ui(game, ren, win_width);
 }
 
 void Game_destory(Game *game)
@@ -165,7 +194,7 @@ void Game_loop(Game* game, FpsCounter* fps, SDL_Renderer* ren, int* pwin_width, 
     Game_update(game, fps, input, *pwin_width, *pwin_height);
 
     SDL_RenderClear(ren);
-    Game_render(game, fps, ren);
+    Game_render(game, fps, ren, *pwin_width, *pwin_height);
     SDL_RenderPresent(ren);
   }
 }
