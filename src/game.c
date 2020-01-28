@@ -106,8 +106,10 @@ void Game_update(Game* game,
                                        win_height);
 
   // Ship collision with asteroids
-  if (Collisions_asteroids_circle(game->asteroids, game->ship.pos, 24)) {
+  Vec* asteroid_collision_position = Collisions_asteroids_circle(game->asteroids, game->ship.pos, 24);
+  if (asteroid_collision_position) {
     printf("Game over\n");
+    Explosions_create(game->explosions, Explosions_generate_type(), *asteroid_collision_position);
     Explosions_create(game->explosions, ExplosionHuge, game->ship.pos);
   }
 }

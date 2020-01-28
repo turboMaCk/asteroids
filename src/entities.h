@@ -8,7 +8,7 @@
 
 // ASTEROIDS
 
-#define MAX_ASTEROIDS 64
+#define MAX_ASTEROIDS 3
 
 typedef enum {
               AsteroidSmall,
@@ -109,7 +109,7 @@ void Projectiles_destroy(Projectiles* projectiles)
 
 // Colisions
 
-bool Collisions_asteroids_point(Asteroids* asteroids,
+Vec* Collisions_asteroids_point(Asteroids* asteroids,
                                 Vec vec,
                                 uint win_width,
                                 uint win_height)
@@ -120,7 +120,7 @@ Projectiles* Collisions_projectile_asteroids(Asteroids* asteroids,
                                          uint win_width,
                                          uint win_height)
   ;
-bool Collisions_asteroids_circle(Asteroids* asteroids, Vec pos, uint r)
+Vec* Collisions_asteroids_circle(Asteroids* asteroids, Vec pos, uint r)
   ;
 
 #endif // _ENTITIES_H_
