@@ -75,17 +75,31 @@ Game* Game_init(SDL_Renderer* ren)
   return game;
 }
 
-void Game_start(Game* game, SDL_Window* win)
+void Game_start(Game* game)
+{
+  game->status = GameRunning;
+}
+
+void Game_restart(Game* game, SDL_Window* win)
 {
   int win_width;
   int win_height;
 
   SDL_GetWindowSize(win, &win_width, &win_height);
   Vec ship_position = { win_width/2, win_height/2 };
+  game->ship.pos = ship_position;
+  game->ship.vel = (Vec) {0,0};
+  game->ship.rotation_mom = 0;
+  game->ship.rotation = 0;
+  game->score = 0;
+
+  Projectiles_destroy(game->projectiles);
+  game->projectiles = NULL;
+
+  Explosions_destroy_all(game->explosions);
+  Asteroids_destroy_all(game->asteroids);
 
   Asteroids_create_random(game->asteroids, win_width, win_height);
-  game->ship.pos = ship_position;
-  game->status = GameRunning;
 }
 
 void Game_update(Game* game,
@@ -180,7 +194,16 @@ void Game_loop(Game* game, FpsCounter* fps, SDL_Renderer* ren, int* pwin_width, 
       Input_controller_handler(&event, &input);
 
       switch (event.type) {
+      case SDL_CONTROLLERBUTTONDOWN: {
+        if (event.cbutton.button == SDL_CONTROLLER_BUTTON_BACK)
+          goto GAME_QUIT_REQUEST;
+      } break;
+      case SDL_KEYDOWN: {
+        if (event.key.keysym.sym == SDLK_ESCAPE)
+          goto GAME_QUIT_REQUEST;
+      } break;
       case SDL_QUIT: {
+        GAME_QUIT_REQUEST:
         game->status = GamePaused;
       } break;
       }

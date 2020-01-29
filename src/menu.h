@@ -10,7 +10,7 @@
 typedef struct {
   SDL_Texture* title;
   SDL_Texture* score;
-  SDL_Texture* instructions;
+  SDL_Texture** instructions;
 } Menu;
 
 Menu* Menu_init(SDL_Renderer *ren, Game*)

@@ -43,7 +43,9 @@ typedef struct {
 
 Game* Game_init(SDL_Renderer* ren)
   ;
-void Game_start(Game* game, SDL_Window* window)
+void Game_start(Game* game)
+  ;
+void Game_restart(Game* game, SDL_Window* window)
   ;
 void Game_loop(Game* game,
                FpsCounter* fps_counter,

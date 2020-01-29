@@ -159,3 +159,11 @@ void Explosions_render(Explosions* explosions, bool keyframe, SDL_Renderer* ren)
     }
   }
 }
+
+void Explosions_destroy_all(Explosions* explosions)
+{
+  for (int i = 0; i < MAX_EXPLOSIONS; ++i) {
+    explosions->size = 0;
+    explosions->arr[i].destroyed = true;
+  }
+}
