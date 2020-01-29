@@ -77,33 +77,45 @@ Menu* Menu_init(SDL_Renderer *ren, Game* game)
   return res;
 }
 
+void Menu_valigh_lines(SDL_Renderer* ren, uint clines, SDL_Texture* textures[], int win_width, int win_height)
+{
+  int space = 10;
+  int total_height = 0;
+  SDL_Rect rects[clines];
+
+  // calculate height
+  for (uint i = 0; i < clines; ++i) {
+    int w, h;
+    SDL_QueryTexture(textures[i], NULL, NULL, &w, &h);
+    total_height += h;
+    if (i + 1 < clines) total_height += space;
+    SDL_Rect rect = {0,0, w,h};
+    rects[i] = rect;
+  }
+
+  int top = (win_height - total_height) / 2;
+
+  // Assign positions
+  for (uint i = 0; i < clines; ++i) {
+    rects[i].y = top;
+    rects[i].x = win_width / 2 - rects[i].w / 2;
+    top += rects[i].h + space;
+
+    // render
+    SDL_RenderCopy(ren, textures[i], NULL, &rects[i]);
+  }
+}
+
 void Menu_render(Menu* menu, SDL_Renderer* ren, int win_width, int win_height)
 {
-  // Render title
-  {
-    int width, height;
-    SDL_QueryTexture(menu->title, NULL, NULL, &width, &height);
-    SDL_Rect dest = {win_width/2 - width/2, win_height/2 - height/2, width, height};
-    SDL_RenderCopy(ren, menu->title, NULL, &dest);
-  }
-
-  // Render Score
-  {
-    int width, height;
-    SDL_QueryTexture(menu->score, NULL, NULL, &width, &height);
-    SDL_Rect dest = {win_width/2 - width/2, win_height/2 - height/2 + 60, width, height};
-    SDL_RenderCopy(ren, menu->score, NULL, &dest);
-  }
-
-  // Render Instructions
-  {
-    for (int i = 0; i < INST_LINES; ++i) {
-      int width, height;
-      SDL_QueryTexture(menu->instructions[i], NULL, NULL, &width, &height);
-      SDL_Rect dest = {win_width/2 - width/2, win_height/2 - height/2 + 110 + (40*i), width, height};
-      SDL_RenderCopy(ren, menu->instructions[i], NULL, &dest);
-    }
-  }
+  int clines = 2 + INST_LINES;
+  SDL_Texture* lines[] = {
+                                menu->title,
+                                menu->score,
+                                menu->instructions[0],
+                                menu->instructions[1],
+  };
+  Menu_valigh_lines(ren, clines, lines, win_width, win_height);
 }
 
 void Menu_destroy(Menu* menu)
