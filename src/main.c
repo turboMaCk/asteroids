@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <SDL2/SDL.h>
-
 #include <stdbool.h>
 #include <math.h>
 #include <time.h>
+#include <assert.h>
 
 #include "window.h"
 #include "input.h"
@@ -27,6 +27,9 @@ void run_loop(Game* game,
   Countdown countdown = Countdown_init(ren);
   Menu* menu = NULL;
 
+  // game needs to be restarted later.
+  bool initialized = false;
+
   while (!quit) {
     FPSC_update(fps);
 
@@ -35,33 +38,67 @@ void run_loop(Game* game,
       // Handle game input
       Window_event_handler(&event, ren, &win_width, &win_height);
 
+      // TODO add controller
       switch (event.type) {
+      case SDL_KEYDOWN: {
+        switch (event.key.keysym.sym) {
+        case SDLK_ESCAPE: {
+          goto QUIT_REQUEST;
+        } break;
+        case SDLK_RETURN2:
+        case SDLK_RETURN: {
+          if (game->status == GameEnded)
+            Game_restart(game, win);
+
+          game->status = GameNotStarted;
+        } break;
+        }
+      } break;
       case SDL_QUIT: {
-        quit = true;
+        QUIT_REQUEST:
+        if (game->status == GameNotStarted) {
+          game->status = GamePaused;
+        } else {
+          quit = true;
+        }
       } break;
       }
     }
     switch (game->status) {
+    case GameNotStarted: {
+      SDL_RenderClear(ren);
+      Game_render(game, fps, ren, win_width, win_height);
+      if (Countdown_render(&countdown, ren, win_width, win_height)) {
+        if (!initialized) {
+          Game_restart(game, win);
+          initialized = true;
+        }
+        Game_start(game);
+      }
+      SDL_RenderPresent(ren);
+    } break;
     case GameRunning: {
       Game_loop(game, fps, ren, &win_width, &win_height);
+      if (menu) Menu_destroy(menu);
+      menu = Menu_init(ren, game);
+      // countdown restarted
       Countdown_restart(&countdown);
     } break;
-    case GameEnded: {
-      if (!menu) menu = Menu_init(ren, game);
+    case GamePaused: {
       SDL_RenderClear(ren);
       Game_render(game, fps, ren, win_width, win_height);
       Menu_render(menu, ren, win_width, win_height);
       SDL_RenderPresent(ren);
     } break;
-      // GameNotStarted
-    default: {
+    case GameEnded: {
       SDL_RenderClear(ren);
       Game_render(game, fps, ren, win_width, win_height);
-      if (Countdown_render(&countdown, ren, win_width, win_height)) {
-        Game_start(game, win);
-      }
+      Menu_render(menu, ren, win_width, win_height);
       SDL_RenderPresent(ren);
-    };
+      printf("ended\n");
+    } break;
+    default:
+      assert(true);
     }
   }
 

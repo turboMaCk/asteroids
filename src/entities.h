@@ -44,6 +44,8 @@ void Asteroids_render(Asteroids* asteroids, bool keyframe, SDL_Renderer* ren)
   ;
 void Asteroids_create_random(Asteroids* asteroids, uint win_width, uint win_height)
   ;
+void Asteroids_destroy_all(Asteroids* asteroids)
+  ;
 
 // Explosions
 
@@ -82,7 +84,8 @@ void Explosions_render(Explosions* explosions, bool keyframe, SDL_Renderer* ren)
   ;
 ExplosionType Explosions_generate_type()
   ;
-
+void Explosions_destroy_all(Explosions* explosions)
+  ;
 // Projectiles
 
 typedef struct {

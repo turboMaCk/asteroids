@@ -14,6 +14,13 @@ Explosions* Explosions_init(SDL_Renderer* ren)
   return res;
 }
 
+void Explosions_destroy_all(Explosions* explosions)
+{
+  for (int i = 0; i < MAX_EXPLOSIONS; ++i) {
+    explosions->arr[i].destroyed = true;
+  }
+}
+
 void Explosions_destroy(Explosions* explosions)
 {
   SDL_DestroyTexture(explosions->texture_small);
