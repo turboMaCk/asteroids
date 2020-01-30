@@ -43,7 +43,7 @@ void run_loop(Game* game,
       case SDL_KEYDOWN: {
         switch (event.key.keysym.sym) {
         case SDLK_ESCAPE: {
-          goto QUIT_REQUEST;
+          goto MAIN_QUIT_REQUEST;
         } break;
         case SDLK_RETURN2:
         case SDLK_RETURN: {
@@ -55,8 +55,10 @@ void run_loop(Game* game,
         }
       } break;
       case SDL_QUIT: {
-        QUIT_REQUEST:
+        MAIN_QUIT_REQUEST:
         if (game->status == GameNotStarted) {
+          if (menu) Menu_destroy(menu);
+          menu = Menu_init(ren, game);
           game->status = GamePaused;
         } else {
           quit = true;
@@ -95,7 +97,6 @@ void run_loop(Game* game,
       Game_render(game, fps, ren, win_width, win_height);
       Menu_render(menu, ren, win_width, win_height);
       SDL_RenderPresent(ren);
-      printf("ended\n");
     } break;
     default:
       assert(true);

@@ -194,10 +194,10 @@ void Game_loop(Game* game, FpsCounter* fps, SDL_Renderer* ren, int* pwin_width, 
       switch (event.type) {
       case SDL_KEYDOWN: {
         if (event.key.keysym.sym == SDLK_ESCAPE)
-          goto QUIT_REQUEST;
+          goto GAME_QUIT_REQUEST;
       } break;
       case SDL_QUIT: {
-        QUIT_REQUEST:
+        GAME_QUIT_REQUEST:
         game->status = GamePaused;
       } break;
       }

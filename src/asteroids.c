@@ -173,6 +173,7 @@ void Asteroids_render(Asteroids* asteroids, bool keyframe, SDL_Renderer* ren)
 void Asteroids_destroy_all(Asteroids* asteroids)
 {
   for (int i = 0; i < MAX_ASTEROIDS; ++i) {
+    asteroids->size = 0;
     asteroids->asteroids[i].destroyed = true;
   }
 }
