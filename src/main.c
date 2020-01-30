@@ -103,6 +103,7 @@ void run_loop(Game* game,
     }
   }
 
+  if (menu) Menu_destroy(menu);
   Contdown_destroy(&countdown);
 }
 
