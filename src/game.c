@@ -89,6 +89,8 @@ void Game_restart(Game* game, SDL_Window* win)
   Vec ship_position = { win_width/2, win_height/2 };
   game->ship.pos = ship_position;
   game->ship.vel = (Vec) {0,0};
+  game->ship.rotation_mom = 0;
+  game->ship.rotation = 0;
   game->score = 0;
 
   Projectiles_destroy(game->projectiles);
