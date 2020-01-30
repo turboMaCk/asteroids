@@ -107,10 +107,15 @@ void run_loop(Game* game,
   Contdown_destroy(&countdown);
 }
 
-int main()
+int main(int argc, char** args)
 {
   int win_width = WIN_WIDTH;
   int win_height = WIN_HEIGHT;
+  SDL_WindowFlags win_flag = SDL_WINDOW_RESIZABLE;
+
+  for (int i = 0; i < argc; ++i) {
+    if (strncmp("-fullscreen", args[i], 11) == 0) win_flag = SDL_WINDOW_FULLSCREEN;
+  }
 
   // seed random
   srand(time(NULL));
@@ -133,7 +138,7 @@ int main()
                          SDL_WINDOWPOS_CENTERED,
                          win_width,
                          win_height,
-                         SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
+                         SDL_WINDOW_SHOWN | win_flag);
 
   if (!win) {
     SDL_Log("CreateWindow Error: %s", SDL_GetError());
