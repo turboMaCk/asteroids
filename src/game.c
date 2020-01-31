@@ -194,6 +194,10 @@ void Game_loop(Game* game, FpsCounter* fps, SDL_Renderer* ren, int* pwin_width, 
       Input_controller_handler(&event, &input);
 
       switch (event.type) {
+      case SDL_CONTROLLERBUTTONDOWN: {
+        if (event.cbutton.button == SDL_CONTROLLER_BUTTON_BACK)
+          goto GAME_QUIT_REQUEST;
+      } break;
       case SDL_KEYDOWN: {
         if (event.key.keysym.sym == SDLK_ESCAPE)
           goto GAME_QUIT_REQUEST;

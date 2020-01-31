@@ -122,7 +122,6 @@ void Input_controller_handler(SDL_Event* event, Input* input)
 
   case SDL_CONTROLLERAXISMOTION: {
     // thrust
-    printf("value: %d\n", event->caxis.value);
     if (event->caxis.axis == SDL_CONTROLLER_AXIS_LEFTY) {
       input->thrust = ((float) (event->caxis.value / -3000))/10;
     }

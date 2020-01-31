@@ -40,6 +40,16 @@ void run_loop(Game* game,
 
       // TODO add controller
       switch (event.type) {
+      case SDL_CONTROLLERBUTTONDOWN: {
+        switch (event.cbutton.button) {
+        case SDL_CONTROLLER_BUTTON_BACK: {
+          goto MAIN_QUIT_REQUEST;
+        } break;
+        case SDL_CONTROLLER_BUTTON_START: {
+          goto MAIN_CONTINUE_REQUEST;
+        } break;
+        }
+      } break;
       case SDL_KEYDOWN: {
         switch (event.key.keysym.sym) {
         case SDLK_ESCAPE: {
@@ -47,6 +57,7 @@ void run_loop(Game* game,
         } break;
         case SDLK_RETURN2:
         case SDLK_RETURN: {
+          MAIN_CONTINUE_REQUEST:
           if (game->status == GameEnded)
             Game_restart(game, win);
 
