@@ -8,6 +8,7 @@
 #include "entities.h"
 #include "input.h"
 #include "game.h"
+#include "background.h"
 
 FpsCounter* FPSC_init()
 {
@@ -71,6 +72,7 @@ Game* Game_init(SDL_Renderer* ren)
   game->projectile_texture = IMG_LoadTexture(ren, "images/spaceship.png");
   game->score = 0;
   game->ui_font = font;
+  game->bg_texture = NULL;
 
   return game;
 }
@@ -153,23 +155,41 @@ void Game_render_ui(const Game* game, SDL_Renderer* ren, int win_width)
   SDL_DestroyTexture(texture);
 }
 
-void Game_render(const Game* game,
+void Game_render(Game* game,
                  const FpsCounter* fps,
                  SDL_Renderer* ren,
                  int win_width,
                  int win_height)
 {
+
+  // Generate backgound if needed
+  {
+    int bg_w, bg_h;
+    SDL_QueryTexture(game->bg_texture, NULL, NULL, &bg_w, &bg_h);
+    if (game->bg_texture == NULL
+        || bg_w != win_width
+        || bg_h != win_height) {
+      game->bg_texture = Background_generate(ren, win_width, win_height);
+    }
+  }
+  // render bg
+  SDL_RenderCopy(ren, game->bg_texture, NULL, NULL);
+
+  // render game
   Projectiles_render(game->projectiles, game->projectile_texture, ren);
   Asteroids_render(game->asteroids, fps->keyframe, ren);
   if (game->status == GameRunning || game->status == GamePaused)
     Ship_render(&game->ship, ren);
   Explosions_render(game->explosions, fps->keyframe, ren);
+
+  // render ui
   Game_render_ui(game, ren, win_width);
 }
 
 void Game_destory(Game *game)
 {
   SDL_DestroyTexture(game->projectile_texture);
+  SDL_DestroyTexture(game->bg_texture);
   TTF_CloseFont(game->ui_font);
 
   Ship_destroy(&game->ship);
