@@ -39,6 +39,7 @@ typedef struct {
   Projectiles* projectiles;
   Uint32 score;
   TTF_Font* ui_font;
+  SDL_Texture* bg_texture;
 } Game;
 
 Game* Game_init(SDL_Renderer* ren)
@@ -59,7 +60,7 @@ void Game_update(Game* game,
                  int win_width,
                  int win_height)
   ;
-void Game_render(const Game* game,
+void Game_render(Game* game,
                  const FpsCounter* fps_counter,
                  SDL_Renderer* renderer,
                  int win_width,

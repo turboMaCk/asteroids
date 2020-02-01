@@ -157,9 +157,6 @@ int main(int argc, char** args)
     return 1;
   }
 
-  // update window size
-  SDL_GetWindowSize(win, &win_width, &win_height);
-
   // Renderer
   ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED);
 
