@@ -15,7 +15,7 @@ typedef struct {
 
 Window Window_init(SDL_Window* window);
 
-void Window_event_handler(SDL_Event* event, SDL_Renderer* ren, int *win_width, int *win_height)
+void Window_event_handler(Window* window, SDL_Event* event, SDL_Renderer* ren)
   ;
 
 #endif

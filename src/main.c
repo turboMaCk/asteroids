@@ -33,7 +33,7 @@ void run_loop(Game* game,
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
       // Handle game input
-      Window_event_handler(&event, ren, &win->width, &win->height);
+      Window_event_handler(win, &event, ren);
 
       // TODO add controller
       switch (event.type) {
@@ -80,7 +80,7 @@ void run_loop(Game* game,
       Game_render(game, fps, ren, win->width, win->height);
       if (Countdown_render(&countdown, ren, win->width, win->height)) {
         if (!initialized) {
-          Game_restart(game, win->sdl_win);
+          Game_restart(game, win);
           initialized = true;
         }
         Game_start(game);
@@ -88,7 +88,7 @@ void run_loop(Game* game,
       SDL_RenderPresent(ren);
     } break;
     case GameRunning: {
-      Game_loop(game, fps, ren, &win->width, &win->height);
+      Game_loop(game, fps, ren, win);
       if (menu) Menu_destroy(menu);
       menu = Menu_init(ren, game);
       // countdown restarted

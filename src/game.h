@@ -52,8 +52,7 @@ void Game_restart(Game* game, Window* window)
 void Game_loop(Game* game,
                FpsCounter* fps_counter,
                SDL_Renderer* ren,
-               int* pwin_width,
-               int* pwin_height)
+               Window* window)
   ;
 void Game_update(Game* game,
                  FpsCounter* fps_counter,

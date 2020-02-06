@@ -195,7 +195,7 @@ void Game_destory(Game *game)
   free(game);
 }
 
-void Game_loop(Game* game, FpsCounter* fps, SDL_Renderer* ren, int* pwin_width, int* pwin_height)
+void Game_loop(Game* game, FpsCounter* fps, SDL_Renderer* ren, Window* win)
 {
   Input input = Input_init();
 
@@ -205,7 +205,7 @@ void Game_loop(Game* game, FpsCounter* fps, SDL_Renderer* ren, int* pwin_width, 
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
       // Handle game input
-      Window_event_handler(&event, ren, pwin_width, pwin_height);
+      Window_event_handler(win, &event, ren);
       Input_keyboard_handler(&event, &input);
       Input_controller_handler(&event, &input);
 
@@ -232,10 +232,10 @@ void Game_loop(Game* game, FpsCounter* fps, SDL_Renderer* ren, int* pwin_width, 
                                              game->ship.rotation);
     }
 
-    Game_update(game, fps, input, *pwin_width, *pwin_height);
+    Game_update(game, fps, input, win->width, win->height);
 
     SDL_RenderClear(ren);
-    Game_render(game, fps, ren, *pwin_width, *pwin_height);
+    Game_render(game, fps, ren, win->width, win->height);
     SDL_RenderPresent(ren);
   }
 }
