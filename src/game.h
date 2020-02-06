@@ -57,14 +57,12 @@ void Game_loop(Game* game,
 void Game_update(Game* game,
                  FpsCounter* fps_counter,
                  Input input,
-                 int win_width,
-                 int win_height)
+                 Window* window)
   ;
 void Game_render(Game* game,
                  const FpsCounter* fps_counter,
                  SDL_Renderer* renderer,
-                 int win_width,
-                 int win_height)
+                 Window* window)
   ;
 void Game_destory(Game *game)
   ;

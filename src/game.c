@@ -103,25 +103,24 @@ void Game_restart(Game* game, Window* win)
 void Game_update(Game* game,
                  FpsCounter* fps,
                  Input input,
-                 int win_width,
-                 int win_height)
+                 Window* win)
 {
   // Ship
-  Ship_update(&input, &game->ship, fps->speed, win_width, win_height);
+  Ship_update(&input, &game->ship, fps->speed, win->width, win->height);
   // Asteroids
-  Asteroids_update(game->asteroids, fps->speed, win_width, win_height);
+  Asteroids_update(game->asteroids, fps->speed, win->width, win->height);
 
   // Projectiles
   game->projectiles = Projectiles_update(game->projectiles,
-                                         win_width,
-                                         win_height,
+                                         win->width,
+                                         win->height,
                                          fps->speed);
   game->projectiles = Collisions_projectile_asteroids(game->asteroids,
                                                       game->projectiles,
                                                       game->explosions,
                                                       &game->score,
-                                                      win_width,
-                                                      win_height);
+                                                      win->width,
+                                                      win->height);
 
   // Ship collision with asteroids
   Vec* asteroid_collision_position = Collisions_asteroids_circle(game->asteroids, game->ship.pos, 24);
@@ -154,8 +153,7 @@ void Game_render_ui(const Game* game, SDL_Renderer* ren, int win_width)
 void Game_render(Game* game,
                  const FpsCounter* fps,
                  SDL_Renderer* ren,
-                 int win_width,
-                 int win_height)
+                 Window* win)
 {
 
   // Generate backgound if needed
@@ -163,9 +161,9 @@ void Game_render(Game* game,
     int bg_w, bg_h;
     SDL_QueryTexture(game->bg_texture, NULL, NULL, &bg_w, &bg_h);
     if (game->bg_texture == NULL
-        || bg_w != win_width
-        || bg_h != win_height) {
-      game->bg_texture = Background_generate(ren, win_width, win_height);
+        || bg_w != win->width
+        || bg_h != win->height) {
+      game->bg_texture = Background_generate(ren, win->width, win->height);
     }
   }
   // render bg
@@ -179,7 +177,7 @@ void Game_render(Game* game,
   Explosions_render(game->explosions, fps->keyframe, ren);
 
   // render ui
-  Game_render_ui(game, ren, win_width);
+  Game_render_ui(game, ren, win->width);
 }
 
 void Game_destory(Game *game)
@@ -232,10 +230,10 @@ void Game_loop(Game* game, FpsCounter* fps, SDL_Renderer* ren, Window* win)
                                              game->ship.rotation);
     }
 
-    Game_update(game, fps, input, win->width, win->height);
+    Game_update(game, fps, input, win);
 
     SDL_RenderClear(ren);
-    Game_render(game, fps, ren, win->width, win->height);
+    Game_render(game, fps, ren, win);
     SDL_RenderPresent(ren);
   }
 }

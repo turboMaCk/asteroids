@@ -77,7 +77,7 @@ void run_loop(Game* game,
     switch (game->status) {
     case GameNotStarted: {
       SDL_RenderClear(ren);
-      Game_render(game, fps, ren, win->width, win->height);
+      Game_render(game, fps, ren, win);
       if (Countdown_render(&countdown, ren, win->width, win->height)) {
         if (!initialized) {
           Game_restart(game, win);
@@ -96,13 +96,13 @@ void run_loop(Game* game,
     } break;
     case GamePaused: {
       SDL_RenderClear(ren);
-      Game_render(game, fps, ren, win->width, win->height);
+      Game_render(game, fps, ren, win);
       Menu_render(menu, ren, win->width, win->height);
       SDL_RenderPresent(ren);
     } break;
     case GameEnded: {
       SDL_RenderClear(ren);
-      Game_render(game, fps, ren, win->width, win->height);
+      Game_render(game, fps, ren, win);
       Menu_render(menu, ren, win->width, win->height);
       SDL_RenderPresent(ren);
     } break;
