@@ -6,7 +6,7 @@ Window Window_init(SDL_Window* win)
   int width, height;
   SDL_GetWindowSize(win, &width, &height);
 
-  Window res = {width, height, width/WIN_WIDTH};
+  Window res = {width, height, width/WIN_WIDTH, win};
   return res;
 }
 

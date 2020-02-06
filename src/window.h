@@ -10,6 +10,7 @@ typedef struct {
   int width;
   int height;
   int dpi;
+  SDL_Window* sdl_win;
 } Window;
 
 Window Window_init(SDL_Window* window);

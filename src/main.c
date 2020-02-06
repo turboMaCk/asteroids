@@ -17,12 +17,9 @@ typedef enum {StateMenu, StateGame, StatePause} State;
 
 void run_loop(Game* game,
               FpsCounter* fps,
-              SDL_Window* win,
+              Window* win,
               SDL_Renderer* ren)
 {
-  int win_width, win_height;
-  SDL_GetWindowSize(win, &win_width, &win_height);
-
   bool quit = false;
   Countdown countdown = Countdown_init(ren);
   Menu* menu = NULL;
@@ -36,7 +33,7 @@ void run_loop(Game* game,
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
       // Handle game input
-      Window_event_handler(&event, ren, &win_width, &win_height);
+      Window_event_handler(&event, ren, &win->width, &win->height);
 
       // TODO add controller
       switch (event.type) {
@@ -59,7 +56,7 @@ void run_loop(Game* game,
         case SDLK_RETURN: {
           MAIN_CONTINUE_REQUEST:
           if (game->status == GameEnded)
-            Game_restart(game, win);
+            Game_restart(game, win->sdl_win);
 
           game->status = GameNotStarted;
         } break;
@@ -80,10 +77,10 @@ void run_loop(Game* game,
     switch (game->status) {
     case GameNotStarted: {
       SDL_RenderClear(ren);
-      Game_render(game, fps, ren, win_width, win_height);
-      if (Countdown_render(&countdown, ren, win_width, win_height)) {
+      Game_render(game, fps, ren, win->width, win->height);
+      if (Countdown_render(&countdown, ren, win->width, win->height)) {
         if (!initialized) {
-          Game_restart(game, win);
+          Game_restart(game, win->sdl_win);
           initialized = true;
         }
         Game_start(game);
@@ -91,7 +88,7 @@ void run_loop(Game* game,
       SDL_RenderPresent(ren);
     } break;
     case GameRunning: {
-      Game_loop(game, fps, ren, &win_width, &win_height);
+      Game_loop(game, fps, ren, &win->width, &win->height);
       if (menu) Menu_destroy(menu);
       menu = Menu_init(ren, game);
       // countdown restarted
@@ -99,14 +96,14 @@ void run_loop(Game* game,
     } break;
     case GamePaused: {
       SDL_RenderClear(ren);
-      Game_render(game, fps, ren, win_width, win_height);
-      Menu_render(menu, ren, win_width, win_height);
+      Game_render(game, fps, ren, win->width, win->height);
+      Menu_render(menu, ren, win->width, win->height);
       SDL_RenderPresent(ren);
     } break;
     case GameEnded: {
       SDL_RenderClear(ren);
-      Game_render(game, fps, ren, win_width, win_height);
-      Menu_render(menu, ren, win_width, win_height);
+      Game_render(game, fps, ren, win->width, win->height);
+      Menu_render(menu, ren, win->width, win->height);
       SDL_RenderPresent(ren);
     } break;
     default:
@@ -171,7 +168,7 @@ int main(int argc, char** args)
   Game* game = Game_init(ren);
   SDL_GameController** controllers = Input_init_controllers();
 
-  run_loop(game, fps, sdl_win, ren);
+  run_loop(game, fps, &window, ren);
 
   // Cleanup
   FPSC_destory(fps);
