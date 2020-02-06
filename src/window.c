@@ -10,7 +10,6 @@ Window Window_init(SDL_Window* win)
   return res;
 }
 
-// TODO improve
 void Window_event_handler(Window* win, SDL_Event* event, SDL_Renderer* ren)
 {
   // Event type must be window
@@ -23,9 +22,10 @@ void Window_event_handler(Window* win, SDL_Event* event, SDL_Renderer* ren)
     int scale = win->width / 1200;
 
     // scale can be at least 1
-    scale = scale < 1 ? 1 : scale;
+    scale = fmax(1, scale);
     win->height /= scale;
     win->width /= scale;
+    win->scale = scale;
 
     // Error when scaling
     if (SDL_RenderSetScale(ren, scale, scale)) {
