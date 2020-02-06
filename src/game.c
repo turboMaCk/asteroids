@@ -82,13 +82,9 @@ void Game_start(Game* game)
   game->status = GameRunning;
 }
 
-void Game_restart(Game* game, SDL_Window* win)
+void Game_restart(Game* game, Window* win)
 {
-  int win_width;
-  int win_height;
-
-  SDL_GetWindowSize(win, &win_width, &win_height);
-  Vec ship_position = { win_width/2, win_height/2 };
+  Vec ship_position = { win->width/2, win->height/2 };
   game->ship.pos = ship_position;
   game->ship.vel = (Vec) {0,0};
   game->ship.rotation_mom = 0;
@@ -101,7 +97,7 @@ void Game_restart(Game* game, SDL_Window* win)
   Explosions_destroy_all(game->explosions);
   Asteroids_destroy_all(game->asteroids);
 
-  Asteroids_create_random(game->asteroids, win_width, win_height);
+  Asteroids_create_random(game->asteroids, win->width, win->height);
 }
 
 void Game_update(Game* game,

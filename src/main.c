@@ -56,7 +56,7 @@ void run_loop(Game* game,
         case SDLK_RETURN: {
           MAIN_CONTINUE_REQUEST:
           if (game->status == GameEnded)
-            Game_restart(game, win->sdl_win);
+            Game_restart(game, win);
 
           game->status = GameNotStarted;
         } break;

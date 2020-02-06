@@ -3,6 +3,7 @@
 
 #include <SDL2/SDL.h>
 #include <SDL_ttf.h>
+#include "window.h"
 #include "ship.h"
 #include "input.h"
 #include "entities.h"
@@ -46,7 +47,7 @@ Game* Game_init(SDL_Renderer* ren)
   ;
 void Game_start(Game* game)
   ;
-void Game_restart(Game* game, SDL_Window* window)
+void Game_restart(Game* game, Window* window)
   ;
 void Game_loop(Game* game,
                FpsCounter* fps_counter,
