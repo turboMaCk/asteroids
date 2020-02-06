@@ -115,6 +115,17 @@ void run_loop(Game* game,
   Contdown_destroy(&countdown);
 }
 
+void print_help() {
+  printf("Asteroids by @turbo_MaCk <marek.faj@gmail.com>\n");
+  printf("https://github.com/turboMaCk/asteroids\n");
+  printf("\n");
+  printf("Usage: asteroids [options]\n");
+  printf("\n");
+  printf("Options:\n");
+  printf("\t--fullscreen \t use fullscreen window mode.\n");
+  printf("\t--help -h \t display this text.\n");
+}
+
 int main(int argc, char** args)
 {
   SDL_WindowFlags win_flag = SDL_WINDOW_RESIZABLE;
@@ -122,8 +133,19 @@ int main(int argc, char** args)
   SDL_Renderer* ren;
   Window window;
 
+  // Help
   for (int i = 0; i < argc; ++i) {
-    if (strncmp("-fullscreen", args[i], 11) == 0) win_flag = SDL_WINDOW_FULLSCREEN;
+    if (strncmp("-h", args[i], 2) == 0 || strncmp("--help", args[i], 6) == 0) {
+      print_help();
+      return 0;
+    }
+  }
+
+  // Fullscreen option
+  for (int i = 0; i < argc; ++i) {
+    if (strncmp("--fullscreen", args[i], 12) == 0) {
+      win_flag = SDL_WINDOW_FULLSCREEN;
+    }
   }
 
   // seed random
