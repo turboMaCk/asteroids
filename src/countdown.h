@@ -5,6 +5,8 @@
 #include <stdbool.h>
 #include <SDL_ttf.h>
 
+#include "window.h"
+
 #define COUNTDOWN 4
 
 typedef struct {
@@ -19,7 +21,7 @@ void Countdown_restart(Countdown* countdown)
   ;
 void Contdown_destroy(Countdown *countdown)
   ;
-bool Countdown_render(Countdown *c, SDL_Renderer* ren, int win_width, int win_height)
+bool Countdown_render(Countdown *c, SDL_Renderer* ren, Window* window)
   ;
 
 #endif // _COUNTDOWN_H_

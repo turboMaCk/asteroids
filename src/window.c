@@ -1,22 +1,31 @@
 #include <SDL2/SDL.h>
 #include "window.h"
 
-// TODO improve
-void Window_event_handler(SDL_Event* event, SDL_Renderer* ren, int *win_width, int *win_height)
+Window Window_init(SDL_Window* win)
+{
+  int width, height;
+  SDL_GetWindowSize(win, &width, &height);
+
+  Window res = {width, height, width/WIN_WIDTH, win};
+  return res;
+}
+
+void Window_event_handler(Window* win, SDL_Event* event, SDL_Renderer* ren)
 {
   // Event type must be window
   if (event->type != SDL_WINDOWEVENT) return;
 
   if (event->window.event == SDL_WINDOWEVENT_SIZE_CHANGED) {
-    *win_width = event->window.data1;
-    *win_height = event->window.data2;
+    win->width = event->window.data1;
+    win->height = event->window.data2;
     // we should use ints here!
-    int scale = *win_width / WIN_WIDTH;
+    int scale = win->width / 1200;
 
     // scale can be at least 1
-    scale = scale < 1 ? 1 : scale;
-    *win_height /= scale;
-    *win_width /= scale;
+    scale = fmax(1, scale);
+    win->height /= scale;
+    win->width /= scale;
+    win->scale = scale;
 
     // Error when scaling
     if (SDL_RenderSetScale(ren, scale, scale)) {
