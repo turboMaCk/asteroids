@@ -5,6 +5,7 @@
 
 #include "menu.h"
 
+#include "window.h"
 // This sort of crates a cyclic dependecy
 #include "game.h"
 
@@ -106,7 +107,7 @@ void Menu_valigh_lines(SDL_Renderer* ren, uint clines, SDL_Texture* textures[], 
   }
 }
 
-void Menu_render(Menu* menu, SDL_Renderer* ren, int win_width, int win_height)
+void Menu_render(Menu* menu, SDL_Renderer* ren, Window* win)
 {
   int clines = 2 + INST_LINES;
   SDL_Texture* lines[] = {
@@ -115,7 +116,7 @@ void Menu_render(Menu* menu, SDL_Renderer* ren, int win_width, int win_height)
                                 menu->instructions[0],
                                 menu->instructions[1],
   };
-  Menu_valigh_lines(ren, clines, lines, win_width, win_height);
+  Menu_valigh_lines(ren, clines, lines, win->width, win->height);
 }
 
 void Menu_destroy(Menu* menu)
