@@ -21,10 +21,10 @@ void Ship_update(Input* input, Ship* ship, float speed, uint win_width, uint win
 {
   // ROTATION
   if (input->rotation != 0) {
-    ship->rotation_mom += fabs(ship->rotation_mom) < 5 ? input->rotation/speed/2 : 0;
+    ship->rotation_mom += fabs(ship->rotation_mom) < 5 ? input->rotation/speed/4 : 0;
   } else {
     // slowing rotation
-    ship->rotation_mom += ship->rotation_mom > 0 ? -0.1/speed : 0.1/speed;
+    ship->rotation_mom += ship->rotation_mom > 0 ? -0.2/speed : 0.2/speed;
   }
   ship->rotation += ship->rotation_mom/speed;
 
