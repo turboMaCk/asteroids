@@ -116,6 +116,13 @@ void Input_destroy_controllers(SDL_GameController** controllers)
   }
 }
 
+float normalize_caxis_value(int value) {
+  float fvalue = ((float) (value / 3000)) / 10;
+
+  fvalue = fvalue < 0.25 && fvalue > -0.25 ? 0 : fvalue;
+  return fvalue;
+}
+
 void Input_controller_handler(SDL_Event* event, Input* input)
 {
   switch (event->type) {
@@ -123,12 +130,12 @@ void Input_controller_handler(SDL_Event* event, Input* input)
   case SDL_CONTROLLERAXISMOTION: {
     // thrust
     if (event->caxis.axis == SDL_CONTROLLER_AXIS_LEFTY) {
-      input->thrust = ((float) (event->caxis.value / -3000))/10;
+      input->thrust = -1 * normalize_caxis_value(event->caxis.value);
     }
 
     // rotation
     if (event->caxis.axis == SDL_CONTROLLER_AXIS_LEFTX) {
-      input->rotation = ((float) (event->caxis.value / 3000)) / 10;
+      input->rotation = normalize_caxis_value(event->caxis.value);
     }
   } break;
 
