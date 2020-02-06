@@ -9,11 +9,12 @@
 Ship Ship_init(Vec pos, SDL_Renderer* ren)
 {
   SDL_Texture* texture = IMG_LoadTexture(ren, "images/spaceship.png");
+  SDL_Texture* fire_texture = IMG_LoadTexture(ren, "images/fire_red.png");
   double rotation = 0;
   double rotation_mom = 0;
   Vec vel = { 0,0 };
 
-  Ship ship = {texture, rotation, rotation_mom, pos, vel};
+  Ship ship = {texture, fire_texture, rotation, rotation_mom, pos, vel};
   return ship;
 }
 
@@ -29,6 +30,7 @@ void Ship_update(Input* input, Ship* ship, float speed, uint win_width, uint win
   ship->rotation += ship->rotation_mom/speed;
 
   float rad = deg_to_radians(ship->rotation);
+
   // VELOCITY
   if (fabs(input->thrust) > 0) {
     Vec thrust_vec = {
@@ -62,7 +64,7 @@ void Ship_render(const Ship* ship, SDL_Renderer* ren)
 {
     SDL_Rect src = {
                     .x = 38,
-                    .y = 38,
+                    .y = 0,
                     .w = 38,
                     .h = 38,
     };
@@ -74,6 +76,59 @@ void Ship_render(const Ship* ship, SDL_Renderer* ren)
                      .h = 38,
     };
     SDL_RenderCopyEx(ren, ship->texture, &src, &dest, ship->rotation, NULL, SDL_FLIP_NONE);
+}
+
+void Ship_render_engines(Ship* ship, Input* input, SDL_Renderer* ren)
+{
+  if (input->thrust > 0) {
+
+    SDL_Rect src = {
+                    .x = 0,
+                    .y = 0,
+                    .w = 32,
+                    .h = 64,
+    };
+
+    // LEFT engine
+    {
+      SDL_Rect dest = {
+                       .x = ship->pos.x - 28,
+                       .y = ship->pos.y + 12,
+                       .w = 32,
+                       .h = 64,
+      };
+
+      SDL_Point center = {28, -12};
+
+      SDL_RenderCopyEx(ren,
+                       ship->fire_texture,
+                       &src,
+                       &dest,
+                       ship->rotation,
+                       &center,
+                       SDL_FLIP_NONE);
+    }
+
+    // Right engine
+    {
+      SDL_Rect dest = {
+                       .x = ship->pos.x - 4,
+                       .y = ship->pos.y + 12,
+                       .w = 32,
+                       .h = 64,
+      };
+
+      SDL_Point center = {4, -12};
+
+      SDL_RenderCopyEx(ren,
+                       ship->fire_texture,
+                       &src,
+                       &dest,
+                       ship->rotation,
+                       &center,
+                       SDL_FLIP_NONE);
+    }
+  }
 }
 
 void Ship_destroy(Ship* ship)
