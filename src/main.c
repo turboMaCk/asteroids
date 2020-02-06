@@ -17,12 +17,9 @@ typedef enum {StateMenu, StateGame, StatePause} State;
 
 void run_loop(Game* game,
               FpsCounter* fps,
-              SDL_Window* win,
+              Window* win,
               SDL_Renderer* ren)
 {
-  int win_width, win_height;
-  SDL_GetWindowSize(win, &win_width, &win_height);
-
   bool quit = false;
   Countdown countdown = Countdown_init(ren);
   Menu* menu = NULL;
@@ -36,7 +33,7 @@ void run_loop(Game* game,
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
       // Handle game input
-      Window_event_handler(&event, ren, &win_width, &win_height);
+      Window_event_handler(win, &event, ren);
 
       // TODO add controller
       switch (event.type) {
@@ -80,8 +77,8 @@ void run_loop(Game* game,
     switch (game->status) {
     case GameNotStarted: {
       SDL_RenderClear(ren);
-      Game_render(game, fps, ren, win_width, win_height);
-      if (Countdown_render(&countdown, ren, win_width, win_height)) {
+      Game_render(game, fps, ren, win);
+      if (Countdown_render(&countdown, ren, win)) {
         if (!initialized) {
           Game_restart(game, win);
           initialized = true;
@@ -91,7 +88,7 @@ void run_loop(Game* game,
       SDL_RenderPresent(ren);
     } break;
     case GameRunning: {
-      Game_loop(game, fps, ren, &win_width, &win_height);
+      Game_loop(game, fps, ren, win);
       if (menu) Menu_destroy(menu);
       menu = Menu_init(ren, game);
       // countdown restarted
@@ -99,14 +96,14 @@ void run_loop(Game* game,
     } break;
     case GamePaused: {
       SDL_RenderClear(ren);
-      Game_render(game, fps, ren, win_width, win_height);
-      Menu_render(menu, ren, win_width, win_height);
+      Game_render(game, fps, ren, win);
+      Menu_render(menu, ren, win);
       SDL_RenderPresent(ren);
     } break;
     case GameEnded: {
       SDL_RenderClear(ren);
-      Game_render(game, fps, ren, win_width, win_height);
-      Menu_render(menu, ren, win_width, win_height);
+      Game_render(game, fps, ren, win);
+      Menu_render(menu, ren, win);
       SDL_RenderPresent(ren);
     } break;
     default:
@@ -118,21 +115,41 @@ void run_loop(Game* game,
   Contdown_destroy(&countdown);
 }
 
+void print_help() {
+  printf("Asteroids by @turbo_MaCk <marek.faj@gmail.com>\n");
+  printf("https://github.com/turboMaCk/asteroids\n");
+  printf("\n");
+  printf("Usage: asteroids [options]\n");
+  printf("\n");
+  printf("Options:\n");
+  printf("\t--fullscreen \t use fullscreen window mode.\n");
+  printf("\t--help -h \t display this text.\n");
+}
+
 int main(int argc, char** args)
 {
-  int win_width = WIN_WIDTH;
-  int win_height = WIN_HEIGHT;
   SDL_WindowFlags win_flag = SDL_WINDOW_RESIZABLE;
+  SDL_Window* sdl_win;
+  SDL_Renderer* ren;
+  Window window;
 
+  // Help
   for (int i = 0; i < argc; ++i) {
-    if (strncmp("-fullscreen", args[i], 11) == 0) win_flag = SDL_WINDOW_FULLSCREEN;
+    if (strncmp("-h", args[i], 2) == 0 || strncmp("--help", args[i], 6) == 0) {
+      print_help();
+      return 0;
+    }
+  }
+
+  // Fullscreen option
+  for (int i = 0; i < argc; ++i) {
+    if (strncmp("--fullscreen", args[i], 12) == 0) {
+      win_flag = SDL_WINDOW_FULLSCREEN;
+    }
   }
 
   // seed random
   srand(time(NULL));
-
-  SDL_Window* win;
-  SDL_Renderer* ren;
 
   // Init SDL
   SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER);
@@ -144,25 +161,27 @@ int main(int argc, char** args)
     return 1;
   }
 
-  win = SDL_CreateWindow("Asteroids",
+  sdl_win = SDL_CreateWindow("Asteroids",
                          SDL_WINDOWPOS_CENTERED,
                          SDL_WINDOWPOS_CENTERED,
-                         win_width,
-                         win_height,
+                         WIN_WIDTH,
+                         WIN_HEIGHT,
                          SDL_WINDOW_SHOWN | win_flag);
 
-  if (!win) {
+  if (!sdl_win) {
     SDL_Log("CreateWindow Error: %s", SDL_GetError());
     SDL_Quit();
     return 1;
   }
 
+  window = Window_init(sdl_win);
+
   // Renderer
-  ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED);
+  ren = SDL_CreateRenderer(sdl_win, -1, SDL_RENDERER_ACCELERATED);
 
   if (!ren) {
     SDL_Log("Create Renderer error: %s", SDL_GetError());
-    SDL_DestroyWindow(win);
+    SDL_DestroyWindow(sdl_win);
     SDL_Quit();
     return 1;
   }
@@ -171,7 +190,7 @@ int main(int argc, char** args)
   Game* game = Game_init(ren);
   SDL_GameController** controllers = Input_init_controllers();
 
-  run_loop(game, fps, win, ren);
+  run_loop(game, fps, &window, ren);
 
   // Cleanup
   FPSC_destory(fps);
@@ -180,7 +199,7 @@ int main(int argc, char** args)
 
   // SDL stuff
   SDL_DestroyRenderer(ren);
-  SDL_DestroyWindow(win);
+  SDL_DestroyWindow(sdl_win);
   SDL_Quit();
   return 0;
 }

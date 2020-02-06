@@ -4,6 +4,7 @@
 #include <SDL2/SDL.h>
 #include <SDL_ttf.h>
 
+#include "window.h"
 // This sort of crates a cyclic dependecy (but not between header but between c files)
 #include "game.h"
 
@@ -15,7 +16,7 @@ typedef struct {
 
 Menu* Menu_init(SDL_Renderer *ren, Game*)
   ;
-void Menu_render(Menu* menu, SDL_Renderer* ren, int win_width, int win_height)
+void Menu_render(Menu* menu, SDL_Renderer* ren, Window* window)
   ;
 void Menu_destroy(Menu* menu)
   ;

@@ -1,5 +1,7 @@
 #include <SDL2/SDL.h>
 #include <SDL_ttf.h>
+
+#include "window.h"
 #include "countdown.h"
 
 Countdown Countdown_init(SDL_Renderer* ren)
@@ -37,7 +39,7 @@ void Contdown_destroy(Countdown *countdown)
   }
 }
 
-bool Countdown_render(Countdown *c, SDL_Renderer* ren, int win_width, int win_height)
+bool Countdown_render(Countdown *c, SDL_Renderer* ren, Window* win)
 {
   Uint32 ms = SDL_GetTicks();
   Uint32 runs_for = ms - c->started;
@@ -49,7 +51,7 @@ bool Countdown_render(Countdown *c, SDL_Renderer* ren, int win_width, int win_he
   int width, height;
 
   SDL_QueryTexture(texture, NULL, NULL, &width, &height);
-  SDL_Rect dest = {win_width/2 - width/2, win_height/2 - height/2, width, height};
+  SDL_Rect dest = {win->width/2 - width/2, win->height/2 - height/2, width, height};
 
   SDL_RenderCopy(ren, texture, NULL, &dest);
 
