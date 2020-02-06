@@ -234,6 +234,7 @@ void Game_loop(Game* game, FpsCounter* fps, SDL_Renderer* ren, Window* win)
 
     SDL_RenderClear(ren);
     Game_render(game, fps, ren, win);
+    Ship_render_engines(&game->ship, &input, ren, fps->keyframe);
     SDL_RenderPresent(ren);
   }
 }
